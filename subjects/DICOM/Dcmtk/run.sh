@@ -24,7 +24,7 @@ if $(strstr $FUZZER "afl") || $(strstr $FUZZER "snapfuzz"); then
 
   # snapfuzz plugin, so i don't have to type it everytime in
   if $(strstr $FUZZER "snapfuzz"); then
-    plugin="-A /home/ubuntu/snapfuzz/SaBRe/build/plugins/snapfuzz/libsnapfuzz.so"
+    plugin="-A /home/ubuntu/SnapFuzz/SaBRe/build/plugins/snapfuzz/libsnapfuzz.so"
     clean=""
   else
     plugin=""
