@@ -21,10 +21,17 @@ if $(strstr $FUZZER "afl"); then
   TARGET_DIR=${TARGET_DIR:-"openssl"}
   INPUTS=${INPUTS:-"${WORKDIR}/in-tls"}
 
+  # snapfuzz plugin, so i don't have to type it everytime in
+  if $(strstr $FUZZER "snapfuzz"); then
+    plugin="-A /home/ubuntu/snapfuzz/SaBRe/build/plugins/snapfuzz/libsnapfuzz.so"
+  else
+    plugin=""
+  fi
+
   #Step-1. Do Fuzzing
   #Move to fuzzing folder
   cd $WORKDIR/${TARGET_DIR}
-  timeout -k 0 --preserve-status $TIMEOUT /home/ubuntu/${FUZZER}/afl-fuzz -d -i ${INPUTS} -x ${WORKDIR}/tls.dict -o $OUTDIR -N tcp://127.0.0.1/4433 $OPTIONS ./apps/openssl s_server -key key.pem -cert cert.pem -4 -naccept 1 -no_anti_replay
+  timeout -k 0 --preserve-status $TIMEOUT /home/ubuntu/${FUZZER}/afl-fuzz -d -i ${INPUTS} -x ${WORKDIR}/tls.dict -o $OUTDIR -N tcp://127.0.0.1/4433 $plugin $OPTIONS ./apps/openssl s_server -key key.pem -cert cert.pem -4 -naccept 1 -no_anti_replay
 
   STATUS=$?
 

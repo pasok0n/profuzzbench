@@ -1,0 +1,46 @@
+from pureftpd
+
+USER root
+RUN apt-get -y update && apt-get -y install make \
+    cmake gettext libtool libsqlite3-dev \
+    gettext-base libelf-dev libc6-dbg cmake-curses-gui
+
+USER ubuntu
+WORKDIR /home/ubuntu
+ENV SNAPFUZZ="/home/ubuntu/snapfuzz"
+
+# These are the "stock" fuzzers, but we only want the modified ones for snapfuzz
+# So remove to avoid confusion.
+RUN rm -rf aflnet aflnwe
+
+RUN git clone --recurse-submodules https://github.com/srg-imperial/SnapFuzz.git $SNAPFUZZ && \
+    cd snapfuzz/SaBRe/plugins && \
+    ln -s ../../snapfuzz snapfuzz && \
+    cd .. && mkdir build && cd build && \
+    cmake .. && make $MAKE_OPT
+
+RUN cd /home/ubuntu/snapfuzz && \
+    git clone https://github.com/andronat/aflnet.git --branch mymaster --single-branch && \
+    cd aflnet && \
+    make clean all && \
+    cd llvm_mode && \
+    make
+
+ENV AFLNET="/home/ubuntu/snapfuzz/aflnet"
+ENV PATH="${PATH}:${AFLNET}:/home/ubuntu/.local/bin:${WORKDIR}"
+ENV AFL_PATH="${AFLNET}"
+
+RUN cd $WORKDIR && rm -rf pure-ftpd
+
+# Set up PureFTPD for fuzzing
+RUN cd ${WORKDIR} && \
+    git clone https://github.com/jedisct1/pure-ftpd.git && \
+    cd pure-ftpd && \
+    git checkout c21b45f && \
+    patch -p1 < ${WORKDIR}/fuzzing.patch && \
+    ./autogen.sh && \
+    CC="$AFLNET/afl-clang-fast" CXX="$AFLNET/afl-clang-fast++" CFLAGS="-fsanitize=address -g -O0" CXXFLAGS="-fsanitize=address -g -O0" LDFLAGS="-fsanitize=address" ./configure --without-privsep -without-capabilities && \
+    make $MAKE_OPT
+
+RUN cd $WORKDIR/pure-ftpd && \
+    cp $SNAPFUZZ/SaBRe/build/sabre .

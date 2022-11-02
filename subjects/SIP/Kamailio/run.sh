@@ -22,6 +22,13 @@ if $(strstr $FUZZER "afl"); then
   TARGET_DIR=${TARGET_DIR:-"kamailio"}
   INPUTS=${INPUTS:-${WORKDIR}"/in-sip"}
 
+  # snapfuzz plugin, so i don't have to type it everytime in
+  if $(strstr $FUZZER "snapfuzz"); then
+    plugin="-A /home/ubuntu/snapfuzz/SaBRe/build/plugins/snapfuzz/libsnapfuzz.so"
+  else
+    plugin=""
+  fi
+
   #Step-1. Do Fuzzing
   #Move to fuzzing folder
   export KAMAILIO_MODULES="src/modules"
@@ -29,7 +36,7 @@ if $(strstr $FUZZER "afl"); then
 
   cd $WORKDIR/${TARGET_DIR}
 
-  timeout -k 0 --preserve-status $TIMEOUT /home/ubuntu/${FUZZER}/afl-fuzz -d -i ${INPUTS} -o $OUTDIR -N udp://127.0.0.1/5060 $OPTIONS -c ${WORKDIR}/run_pjsip ./src/kamailio -f ${WORKDIR}/kamailio-basic.cfg -L $KAMAILIO_MODULES -Y $KAMAILIO_RUNTIME_DIR -n 1 -D -E
+  timeout -k 0 --preserve-status $TIMEOUT /home/ubuntu/${FUZZER}/afl-fuzz -d -i ${INPUTS} -o $OUTDIR -N udp://127.0.0.1/5060 $plugin $OPTIONS -c ${WORKDIR}/run_pjsip ./src/kamailio -f ${WORKDIR}/kamailio-basic.cfg -L $KAMAILIO_MODULES -Y $KAMAILIO_RUNTIME_DIR -n 1 -D -E
 
   STATUS=$?
 

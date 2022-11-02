@@ -22,6 +22,13 @@ if $(strstr $FUZZER "afl"); then
   TARGET_DIR=${TARGET_DIR:-"openssh"}
   INPUTS=${INPUTS:-${WORKDIR}"/in-ssh"}
 
+  # snapfuzz plugin, so i don't have to type it everytime in
+  if $(strstr $FUZZER "snapfuzz"); then
+    plugin="-A /home/ubuntu/snapfuzz/SaBRe/build/plugins/snapfuzz/libsnapfuzz.so"
+  else
+    plugin=""
+  fi
+
   #Step-1. Do Fuzzing
   #Move to fuzzing folder
   cd $WORKDIR/${TARGET_DIR}
@@ -32,7 +39,7 @@ if $(strstr $FUZZER "afl"); then
   sleep 5
   sshpass -p "ubuntu" ssh -oStrictHostKeyChecking=no ubuntu@127.0.0.1 -p 22 "exit"
 
-  timeout -k 0 --preserve-status $TIMEOUT /home/ubuntu/${FUZZER}/afl-fuzz -d -i ${INPUTS} -x ${WORKDIR}/ssh.dict -o $OUTDIR -N tcp://127.0.0.1/22 $OPTIONS ./sshd -d -e -p 22 -r -f sshd_config
+  timeout -k 0 --preserve-status $TIMEOUT /home/ubuntu/${FUZZER}/afl-fuzz -d -i ${INPUTS} -x ${WORKDIR}/ssh.dict -o $OUTDIR -N tcp://127.0.0.1/22 $plugin $OPTIONS ./sshd -d -e -p 22 -r -f sshd_config
 
   STATUS=$?
 

@@ -1,0 +1,45 @@
+from kamailio
+
+USER root
+RUN apt-get -y update && apt-get -y install make \
+    cmake gettext libtool libsqlite3-dev \
+    gettext-base libelf-dev libc6-dbg cmake-curses-gui
+
+USER ubuntu
+WORKDIR /home/ubuntu
+ENV SNAPFUZZ="/home/ubuntu/snapfuzz"
+
+# These are the "stock" fuzzers, but we only want the modified ones for snapfuzz
+# So remove to avoid confusion.
+RUN rm -rf aflnet aflnwe
+
+RUN git clone --recurse-submodules https://github.com/srg-imperial/SnapFuzz.git $SNAPFUZZ && \
+    cd snapfuzz/SaBRe/plugins && \
+    ln -s ../../snapfuzz snapfuzz && \
+    cd .. && mkdir build && cd build && \
+    cmake .. && make $MAKE_OPT
+
+RUN cd /home/ubuntu/snapfuzz && \
+    git clone https://github.com/andronat/aflnet.git --branch mymaster --single-branch && \
+    cd aflnet && \
+    make clean all && \
+    cd llvm_mode && \
+    make
+
+ENV AFLNET="/home/ubuntu/snapfuzz/aflnet"
+ENV PATH="${PATH}:${AFLNET}:/home/ubuntu/.local/bin:${WORKDIR}"
+ENV AFL_PATH="${AFLNET}"
+
+RUN cd $WORKDIR && rm -rf kamailio
+
+# Download and compile Kamalio for fuzzing
+RUN cd $WORKDIR && \
+    git clone https://github.com/kamailio/kamailio.git && \
+    cd kamailio && \
+    git checkout 2648eb3 && \
+    patch -p1 < $WORKDIR/kamailio.patch && \
+    CC=$AFLNET/afl-clang-fast make MEMPKG=sys cfg && \
+    AFL_USE_ASAN=1 CC=$AFLNET/afl-clang-fast make all $MAKE_OPT
+
+RUN cd $WORKDIR/kamailio && \
+    cp $SNAPFUZZ/SaBRe/build/sabre .

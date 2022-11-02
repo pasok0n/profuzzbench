@@ -1,0 +1,58 @@
+from openssh
+
+USER root
+RUN apt-get -y update && apt-get -y install make \
+    cmake gettext libtool libsqlite3-dev \
+    gettext-base libelf-dev libc6-dbg cmake-curses-gui
+
+USER ubuntu
+WORKDIR /home/ubuntu
+ENV SNAPFUZZ="/home/ubuntu/snapfuzz"
+
+# These are the "stock" fuzzers, but we only want the modified ones for snapfuzz
+# So remove to avoid confusion.
+RUN rm -rf aflnet aflnwe
+
+RUN git clone --recurse-submodules https://github.com/srg-imperial/SnapFuzz.git $SNAPFUZZ && \
+    cd snapfuzz/SaBRe/plugins && \
+    ln -s ../../snapfuzz snapfuzz && \
+    cd .. && mkdir build && cd build && \
+    cmake .. && make $MAKE_OPT
+
+RUN cd /home/ubuntu/snapfuzz && \
+    git clone https://github.com/andronat/aflnet.git --branch mymaster --single-branch && \
+    cd aflnet && \
+    make clean all && \
+    cd llvm_mode && \
+    make
+
+ENV AFLNET="/home/ubuntu/snapfuzz/aflnet"
+ENV PATH="${PATH}:${AFLNET}:/home/ubuntu/.local/bin:${WORKDIR}"
+ENV AFL_PATH="${AFLNET}"
+
+USER root
+
+RUN cd ${WORKDIR} && rm -rf openssh
+
+# Download and compile OpenSSH for fuzzing
+RUN cd ${WORKDIR} && \
+    git clone https://github.com/vegard/openssh-portable.git openssh && \
+    cd openssh && \
+    git checkout 7cfea58 && \
+    cp ${WORKDIR}/rand.inc . && \
+    patch -p1 < ${WORKDIR}/rand.patch && \
+    autoreconf && \
+    ./configure \
+    CC="$AFLNET/afl-clang-fast" \
+    CFLAGS="-g -O3 -I$WORKDIR/openssl-install/include" \
+    --prefix=$PWD/install \
+    --with-openssl=$WORKDIR/openssl-install \
+    --with-ldflags="-L$WORKDIR/openssl-install/lib" \
+    --with-privsep-path=$PWD/var-empty \
+    --with-sandbox=no \
+    --with-privsep-user=ubuntu && \
+    AFL_USE_ASAN=1 make $MAKE_OPT && \
+    make install
+
+RUN cd $WORKDIR/openssh && \
+    cp $SNAPFUZZ/SaBRe/build/sabre .

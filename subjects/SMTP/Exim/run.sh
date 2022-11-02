@@ -22,11 +22,25 @@ if $(strstr $FUZZER "afl"); then
     source ${WORKDIR}/run-${FUZZER}
   fi
 
+
+  # snapfuzz plugin, so i don't have to type it everytime in
+  if $(strstr $FUZZER "snapfuzz"); then
+    plugin="-A /home/ubuntu/snapfuzz/SaBRe/build/plugins/snapfuzz/libsnapfuzz.so"
+  else
+    plugin=""
+  fi
+
+  if $(strstr $FUZZER "snapfuzz"); then
+    clean=""
+  else
+    clean="-c ${WORKDIR}/clean"
+  fi
+
   #Step-1. Do Fuzzing
   #Move to fuzzing folder
   cd $WORKDIR/${TARGET_DIR}
   cp ./src/build-Linux-x86_64/exim /usr/exim/bin/exim
-  timeout -k 0 --preserve-status $TIMEOUT /home/ubuntu/${FUZZER}/afl-fuzz -d -i ${INPUTS} -x ${WORKDIR}/smtp.dict -o $OUTDIR -N tcp://127.0.0.1/25 $OPTIONS -c ${WORKDIR}/clean exim -bd -d -oX 25 -oP /var/lock/exim.pid
+  timeout -k 0 --preserve-status $TIMEOUT /home/ubuntu/${FUZZER}/afl-fuzz -d -i ${INPUTS} -x ${WORKDIR}/smtp.dict -o $OUTDIR -N tcp://127.0.0.1/25 $plugin $OPTIONS $clean exim -bd -d -oX 25 -oP /var/lock/exim.pid
 
   STATUS=$?
 
