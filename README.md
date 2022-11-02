@@ -1,4 +1,4 @@
-*SnapFuzz only works with LightFTP, Live555, TinyDTLS, Dnsmasq and Dcmtk!**
+**SnapFuzz only works with LightFTP, Live555, TinyDTLS, Dnsmasq and Dcmtk!**
 
 # SnapFuzz
 
