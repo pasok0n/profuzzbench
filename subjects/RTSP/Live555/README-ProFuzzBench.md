@@ -1,4 +1,6 @@
-Please carefully read the [main README-ProFuzzBench.md](../../../README-ProFuzzBench.md), which is stored in the benchmark's root folder, before following this subject-specific guideline.
+Please carefully read the [main README.md](../../../README.md), which is stored in the benchmark's root folder, before following this subject-specific guideline.
+
+[Guide for SnapFuzz](README-SnapFuzz.md)
 
 # Fuzzing Live555 server with AFLNet and AFLnwe
 Please follow the steps below to run and collect experimental results for Live555.
@@ -10,7 +12,6 @@ The following commands create a docker image tagged Live555. The image should ha
 cd $PFBENCH
 cd subjects/RTSP/Live555
 docker build . -t live555
-docker build . -f Dockerfile-snapfuzz -t live555-snapfuzz
 ```
 
 ## Step-2. Run fuzzing
@@ -21,7 +22,7 @@ cd $PFBENCH
 mkdir results-live555
 
 profuzzbench_exec_common.sh live555 4 results-live555 aflnet out-live555-aflnet "-P RTSP -D 10000 -q 3 -s 3 -E -K -R" 3600 5 &
-profuzzbench_exec_common.sh live555-snapfuzz 4 results-live555 snapfuzz/aflnet out-live555-snapfuzz "-P RTSP -D 10000 -q 3 -s 3 -K -R -E -m none -t 5000" 3600 5
+profuzzbench_exec_common.sh live555 4 results-live555 aflnwe out-live555-aflnwe "-D 10000 -K" 3600 5
 ```
 
 ## Step-3. Collect the results
@@ -31,7 +32,7 @@ The following commands collect the  code coverage results produced by AFLNet and
 cd $PFBENCH/results-live555
 
 profuzzbench_generate_csv.sh live555 4 aflnet results.csv 0
-profuzzbench_generate_csv.sh live555 4 snapfuzz results.csv 1
+profuzzbench_generate_csv.sh live555 4 aflnwe results.csv 1
 ```
 
 ## Step-4. Analyze the results
