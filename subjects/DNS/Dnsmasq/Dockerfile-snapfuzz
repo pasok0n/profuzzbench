@@ -1,0 +1,43 @@
+from dnsmasq
+
+USER root
+RUN apt-get -y update && apt-get -y install make \
+    cmake gettext libtool libsqlite3-dev \
+    gettext-base libelf-dev libc6-dbg cmake-curses-gui
+
+USER ubuntu
+WORKDIR /home/ubuntu
+ENV SNAPFUZZ="/home/ubuntu/SnapFuzz"
+ENV AFLNET="/home/ubuntu/snapfuzz"
+
+#SnapFuzz
+RUN git clone --recurse-submodules https://github.com/srg-imperial/SnapFuzz.git $SNAPFUZZ && \
+    cd $SNAPFUZZ/SaBRe/plugins && \
+    ln -s ../../snapfuzz snapfuzz && \
+    cd .. && mkdir build && cd build && \
+    cmake .. && make $MAKE_OPT
+
+#SnapFuzz's modified version of AFLnet 
+RUN git clone https://github.com/andronat/aflnet.git --branch mymaster --single-branch $AFLNET && \
+    cd $AFLNET && \
+    make clean all && \
+    cd llvm_mode && \
+    make
+
+ENV PATH="${PATH}:${AFLNET}:/home/ubuntu/.local/bin:${WORKDIR}"
+ENV AFL_PATH="${AFLNET}"
+
+USER root
+
+COPY --chown=ubuntu:ubuntu run-snapfuzz.sh ${WORKDIR}/run-snapfuzz
+
+# Download and compile Dnsmasq for fuzzing
+RUN cd $WORKDIR && \
+    git clone git://thekelleys.org.uk/dnsmasq.git dnsmasq-snapfuzz && \
+    cd dnsmasq-snapfuzz && \
+    git checkout v2.73rc6 && \
+    patch -p1 < ${WORKDIR}/dnsmasq.patch && \
+    AFL_USE_ASAN=1 CC="$AFLNET/afl-clang-fast" make $MAKE_OPT
+
+RUN cd $WORKDIR/dnsmasq-snapfuzz/src/ && \
+    cp $SNAPFUZZ/SaBRe/build/sabre .
