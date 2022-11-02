@@ -20,7 +20,8 @@ RUN apt-get -y update && \
     gdb \
     netcat \
     strace \
-    wget
+    wget \
+    libcap-dev
 
 # Add a new user ubuntu, pass: ubuntu
 RUN groupadd ubuntu && \
@@ -38,7 +39,7 @@ WORKDIR /home/ubuntu
 ARG MAKE_OPT
 
 # Set up fuzzers
-RUN git clone https://github.com/profuzzbench/aflnet.git && \
+RUN git clone https://github.com/pasok0n/aflnet.git && \
     cd aflnet && \
     make clean all $MAKE_OPT && \
     cd llvm_mode && make $MAKE_OPT
