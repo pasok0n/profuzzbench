@@ -12,7 +12,7 @@ strstr() {
 }
 
 #Commands for afl-based fuzzers (e.g., aflnet, aflnwe)
-if $(strstr $FUZZER "afl"); then
+if $(strstr $FUZZER "afl") || $(strstr $FUZZER "snapfuzz"); then
 
   # Run fuzzer-specific commands (if any)
   if [ -e ${WORKDIR}/run-${FUZZER} ]; then
@@ -24,7 +24,7 @@ if $(strstr $FUZZER "afl"); then
 
   # snapfuzz plugin, so i don't have to type it everytime in
   if $(strstr $FUZZER "snapfuzz"); then
-    plugin="-A /home/ubuntu/snapfuzz-plugin/SaBRe/build/plugins/snapfuzz/libsnapfuzz.so"
+    plugin="-A /home/ubuntu/snapfuzz/SaBRe/build/plugins/snapfuzz/libsnapfuzz.so"
     clean=""
   else
     plugin=""

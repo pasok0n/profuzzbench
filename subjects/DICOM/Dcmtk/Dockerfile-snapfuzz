@@ -7,25 +7,23 @@ RUN apt-get -y update && apt-get -y install make \
 
 USER ubuntu
 WORKDIR /home/ubuntu
-ENV AFLNET="/home/ubuntu/snapfuzz"
-ENV SNAPFUZZ="/home/ubuntu/SnapFuzz"
-
-RUN rm -rf aflnet aflnwe
+ENV SNAPFUZZ="/home/ubuntu/snapfuzz"
 
 #SnapFuzz
 RUN git clone --recurse-submodules https://github.com/srg-imperial/SnapFuzz.git $SNAPFUZZ && \
-    cd SnapFuzz/SaBRe/plugins && \
+    cd snapfuzz/SaBRe/plugins && \
     ln -s ../../snapfuzz snapfuzz && \
     cd .. && mkdir build && cd build && \
     cmake .. && make $MAKE_OPT
 
 #SnapFuzz's modified version of AFLnet 
-RUN git clone https://github.com/andronat/aflnet.git --branch mymaster --single-branch $AFLNET && \
+RUN git clone https://github.com/andronat/aflnet.git --branch mymaster --single-branch $SNAPFUZZ && \
     cd snapfuzz && \
     make clean all && \
     cd llvm_mode && \
     make
 
+ENV AFLNET="${SNAPFUZZ}"
 ENV PATH="${PATH}:${AFLNET}:/home/ubuntu/.local/bin:${WORKDIR}"
 ENV AFL_PATH="${AFLNET}"
 
@@ -35,7 +33,7 @@ USER root
 
 # Download and compile Dcmtk for fuzzing with SnapFuzz
 RUN cd $WORKDIR && \
-    git clone https://github.com/DCMTK/dcmtk dcmtk-snapfuzz&& \
+    git clone https://github.com/DCMTK/dcmtk dcmtk-snapfuzz && \
     cd dcmtk-snapfuzz && \
     git checkout 7f8564c && \
     patch -p1 < $WORKDIR/fuzzing-snapfuzz.patch && \
