@@ -22,11 +22,24 @@ if $(strstr $FUZZER "afl"); then
   TARGET_DIR=${TARGET_DIR:-"LightFTP"}
   INPUTS=${INPUTS:-"${WORKDIR}/in-ftp"}
 
+  # snapfuzz plugin, so i don't have to type it everytime in
+  if $(strstr $FUZZER "snapfuzz"); then
+    plugin="-A /home/ubuntu/snapfuzz/SaBRe/build/plugins/snapfuzz/libsnapfuzz.so"
+  else
+    plugin=""
+  fi
+
+  if $(strstr $FUZZER "snapfuzz"); then
+    clean=""
+  else
+    clean="-c ${WORKDIR}/ftpclean"
+  fi
+
   #Step-1. Do Fuzzing
   #Move to fuzzing folder
   cd $WORKDIR/${TARGET_DIR}/Source/Release
   echo "$WORKDIR/${TARGET_DIR}/Source/Release"
-  timeout -k 0 --preserve-status $TIMEOUT /home/ubuntu/${FUZZER}/afl-fuzz -d -i ${INPUTS} -x ${WORKDIR}/ftp.dict -o $OUTDIR -N tcp://127.0.0.1/2200 $OPTIONS -c ${WORKDIR}/ftpclean ./fftp fftp.conf 2200
+  timeout -k 0 --preserve-status $TIMEOUT /home/ubuntu/${FUZZER}/afl-fuzz -d -i ${INPUTS} -x ${WORKDIR}/ftp.dict -o $OUTDIR -N tcp://127.0.0.1/2200 $plugin $OPTIONS $clean ./fftp fftp.conf 2200
 
   STATUS=$?
 
