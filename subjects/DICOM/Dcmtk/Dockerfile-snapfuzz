@@ -1,0 +1,54 @@
+from dcmtk
+
+USER root
+RUN apt-get -y update && apt-get -y install make \
+    cmake gettext libtool libsqlite3-dev \
+    gettext-base libelf-dev libc6-dbg cmake-curses-gui
+
+USER ubuntu
+WORKDIR /home/ubuntu
+ENV AFLNET="/home/ubuntu/snapfuzz"
+ENV SNAPFUZZ="/home/ubuntu/SnapFuzz"
+
+RUN rm -rf aflnet aflnwe
+
+#SnapFuzz
+RUN git clone --recurse-submodules https://github.com/srg-imperial/SnapFuzz.git $SNAPFUZZ && \
+    cd SnapFuzz/SaBRe/plugins && \
+    ln -s ../../snapfuzz snapfuzz && \
+    cd .. && mkdir build && cd build && \
+    cmake .. && make $MAKE_OPT
+
+#SnapFuzz's modified version of AFLnet 
+RUN git clone https://github.com/andronat/aflnet.git --branch mymaster --single-branch $AFLNET && \
+    cd snapfuzz && \
+    make clean all && \
+    cd llvm_mode && \
+    make
+
+ENV PATH="${PATH}:${AFLNET}:/home/ubuntu/.local/bin:${WORKDIR}"
+ENV AFL_PATH="${AFLNET}"
+
+COPY --chown=ubuntu:ubuntu fuzzing-snapfuzz.patch ${WORKDIR}/fuzzing-snapfuzz.patch
+
+USER root
+
+# Download and compile Dcmtk for fuzzing with SnapFuzz
+RUN cd $WORKDIR && \
+    git clone https://github.com/DCMTK/dcmtk dcmtk-snapfuzz&& \
+    cd dcmtk-snapfuzz && \
+    git checkout 7f8564c && \
+    patch -p1 < $WORKDIR/fuzzing-snapfuzz.patch && \
+    mkdir build && cd build && \
+    cmake .. && \
+    AFL_USE_ASAN=1 make dcmqrscp $MAKE_OPT
+
+COPY --chown=ubuntu:ubuntu dicom.dic ${WORKDIR}/dcmtk-snapfuzz/dcmdata/data/dicom.dic
+COPY --chown=ubuntu:ubuntu run-snapfuzz.sh ${WORKDIR}/run-snapfuzz
+
+RUN cd $WORKDIR/dcmtk-snapfuzz/build/bin && \
+    mkdir ACME_STORE && \
+    cp $WORKDIR/dcmqrscp.cfg ./
+
+RUN cd $WORKDIR/dcmtk-snapfuzz/build/bin/ && \
+    cp $SNAPFUZZ/SaBRe/build/sabre .
