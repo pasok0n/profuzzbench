@@ -20,7 +20,7 @@ ENV PATH=${STATEAFL}:${PATH}
 RUN cd $WORKDIR && \
     git clone https://github.com/hfiref0x/LightFTP.git LightFTP-stateafl && \
     cd LightFTP-stateafl && \
-    git checkout 5980ea1 && \
+    git checkout 85c6a90 && \
     patch -p1 < ${WORKDIR}/fuzzing.patch && \
     cd Source/Release && \
     CC=${STATEAFL}/afl-clang-fast make clean all $MAKE_OPT
