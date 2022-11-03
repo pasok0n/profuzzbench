@@ -75,7 +75,7 @@ env ASAN_OPTIONS='abort_on_error=1:symbolize=0:detect_leaks=0:detect_stack_use_a
 RUN cd $WORKDIR && \
     git clone https://github.com/DCMTK/dcmtk && \
     cd dcmtk && \
-    git checkout 7f8564c && \
+    git checkout b8950f9 && \
     patch -p1 < $WORKDIR/fuzzing.patch && \
     mkdir build && cd build && \
     cmake .. && \
@@ -86,7 +86,7 @@ RUN cd $WORKDIR && \
 RUN cd $WORKDIR && \
     git clone https://github.com/DCMTK/dcmtk dcmtk-gcov && \
     cd dcmtk-gcov && \
-    git checkout 7f8564c && \
+    git checkout b8950f9 && \
     patch -p1 < $WORKDIR/normal.patch && \
     mkdir build && cd build && \
     cmake -G"Unix Makefiles" .. -DCMAKE_C_FLAGS="-g -fprofile-arcs -ftest-coverage" -DCMAKE_CXX_FLAGS="-g -fprofile-arcs -ftest-coverage" && \
