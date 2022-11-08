@@ -26,9 +26,9 @@ ENV PATH=${STATEAFL}:${PATH}
 
 # Dedicated instrumented version for StateAFL
 RUN cd $WORKDIR && \
-    git clone https://github.com/ejurgensen/forked-daapd.git forked-daapd-stateafl && \
+    git clone https://github.com/owntone/owntone-server.git forked-daapd-stateafl && \
     cd forked-daapd-stateafl && \
-    git checkout 2ca10d9 && \
+    git checkout d468fd3 && \
     patch -p1 < $WORKDIR/forked-daapd.patch && \
     autoreconf -i && \
     CC=${STATEAFL}/afl-clang-fast CFLAGS="-DSQLITE_CORE" ./configure --prefix=/usr --sysconfdir=/etc --localstatedir=/var  --disable-mpd --disable-itunes --disable-lastfm --disable-spotify --disable-verification  --disable-shared --enable-static && \

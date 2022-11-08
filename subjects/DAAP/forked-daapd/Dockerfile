@@ -83,9 +83,9 @@ env ASAN_OPTIONS='abort_on_error=1:symbolize=0:detect_leaks=0:detect_stack_use_a
 
 # Download and compile forked-daapd for fuzzing
 RUN cd $WORKDIR && \
-    git clone https://github.com/ejurgensen/forked-daapd.git && \
+    git clone https://github.com/owntone/owntone-server.git && \
     cd forked-daapd && \
-    git checkout 2ca10d9 && \
+    git checkout d468fd3 && \
     patch -p1 < $WORKDIR/forked-daapd.patch && \
     autoreconf -i && \
     CC=$AFLNET/afl-clang-fast CFLAGS="-DSQLITE_CORE" ./configure --prefix=/usr --sysconfdir=/etc --localstatedir=/var  --disable-mpd --disable-itunes --disable-lastfm --disable-spotify --disable-verification  --disable-shared --enable-static && \
@@ -94,9 +94,9 @@ RUN cd $WORKDIR && \
 
 # Download and compile forked-daapd for code coverage analysis
 RUN cd $WORKDIR && \
-    git clone https://github.com/ejurgensen/forked-daapd.git forked-daapd-gcov && \
+    git clone https://github.com/owntone/owntone-server.git forked-daapd-gcov && \
     cd forked-daapd-gcov && \
-    git checkout 2ca10d9 && \
+    git checkout d468fd3 && \
     patch -p1 < $WORKDIR/forked-daapd.patch && \
     patch -p1 < $WORKDIR/forked-daapd-gcov.patch && \
     autoreconf -i && \
