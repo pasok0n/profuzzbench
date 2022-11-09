@@ -84,7 +84,7 @@ env ASAN_OPTIONS='abort_on_error=1:symbolize=0:detect_leaks=0:detect_stack_use_a
 RUN cd ${WORKDIR} && \
     git clone https://github.com/Exim/exim && \
     cd exim && \
-    git checkout 38903fb && \
+    git checkout 73e85c6 && \
     patch -p1 < ${WORKDIR}/exim-rand.patch && \
     patch -p1 < ${WORKDIR}/exim-log-bug.patch && \
     cd src; mkdir Local; cp src/EDITME Local/Makefile && \
@@ -95,7 +95,7 @@ RUN cd ${WORKDIR} && \
 RUN cd ${WORKDIR} && \
     git clone https://github.com/Exim/exim exim-gcov && \
     cd exim-gcov && \
-    git checkout 38903fb && \
+    git checkout 73e85c6 && \
     patch -p1 < ${WORKDIR}/exim-rand.patch && \
     patch -p1 < ${WORKDIR}/exim-log-bug.patch && \
     cd src; mkdir Local; cp src/EDITME Local/Makefile && \

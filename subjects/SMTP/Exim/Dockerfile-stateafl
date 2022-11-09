@@ -21,7 +21,7 @@ ENV PATH=${STATEAFL}:${PATH}
 RUN cd ${WORKDIR} && \
     git clone https://github.com/Exim/exim exim-stateafl && \
     cd exim-stateafl && \
-    git checkout 38903fb && \
+    git checkout 73e85c6 && \
     patch -p1 < ${WORKDIR}/exim-rand.patch && \
     patch -p1 < ${WORKDIR}/exim-log-bug.patch && \
     cd src; mkdir Local; cp src/EDITME Local/Makefile && \
