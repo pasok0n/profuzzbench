@@ -72,7 +72,7 @@ env ASAN_OPTIONS='abort_on_error=1:symbolize=0:detect_leaks=0:detect_stack_use_a
 RUN cd $WORKDIR && \
     git clone https://github.com/rgaufman/live555.git && \
     cd live555 && \
-    git checkout ceeb4f4 && \
+    git checkout bbee4ed && \
     patch -p1 < $WORKDIR/fuzzing.patch && \
     ./genMakefiles linux && \
     AFL_USE_ASAN=1 make clean all $MAKE_OPT || make all
@@ -85,7 +85,7 @@ RUN cd ${WORKDIR}/live555/testProgs && \
 RUN cd $WORKDIR && \
     git clone https://github.com/rgaufman/live555.git live555-cov && \
     cd live555-cov && \
-    git checkout ceeb4f4 && \
+    git checkout bbee4ed && \
     patch -p1 < $WORKDIR/gcov.patch && \
     ./genMakefiles linux && \
     make CFLAGS="-fprofile-arcs -ftest-coverage" CPPFLAGS="-fprofile-arcs -ftest-coverage" CXXFLAGS="-fprofile-arcs -ftest-coverage" LDFLAGS="-fprofile-arcs -ftest-coverage" clean all
