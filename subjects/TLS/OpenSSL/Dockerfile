@@ -65,6 +65,7 @@ RUN mkdir $WORKDIR
 COPY --chown=ubuntu:ubuntu key.pem ${WORKDIR}/key.pem
 COPY --chown=ubuntu:ubuntu cert.pem ${WORKDIR}/cert.pem
 COPY --chown=ubuntu:ubuntu rand.patch ${WORKDIR}/rand.patch
+COPY --chown=ubuntu:ubuntu rand.inc ${WORKDIR}/rand.inc
 
 # Set up environment variables for ASAN
 env ASAN_OPTIONS='abort_on_error=1:symbolize=0:detect_leaks=0:detect_stack_use_after_return=1:detect_container_overflow=0:poison_array_cookie=0:malloc_fill_byte=0:max_malloc_fill_size=16777216'
@@ -75,6 +76,7 @@ RUN cd ${WORKDIR} && \
     cd openssl && \
     cp ${WORKDIR}/*.pem ./ && \
     git checkout 19cc035 && \
+    cp ${WORKDIR}/rand.inc fuzz/ && \
     patch -p1 < ${WORKDIR}/rand.patch && \
     CC=afl-clang-fast ./config no-shared --with-rand-seed=none && \
     CC=afl-clang-fast make include/openssl/configuration.h include/openssl/opensslv.h include/crypto/bn_conf.h include/crypto/dso_conf.h && \
@@ -87,6 +89,7 @@ RUN cd ${WORKDIR} && \
     cd openssl-gcov && \
     cp ${WORKDIR}/*.pem ./ && \
     git checkout 19cc035 && \
+    cp ${WORKDIR}/rand.inc fuzz/ && \
     patch -p1 < ${WORKDIR}/rand.patch && \
     CFLAGS="-fprofile-arcs -ftest-coverage" LDFLAGS="-fprofile-arcs -ftest-coverage" ./config no-shared --with-rand-seed=none && \
     CFLAGS="-fprofile-arcs -ftest-coverage" LDFLAGS="-fprofile-arcs -ftest-coverage" make include/openssl/configuration.h include/openssl/opensslv.h include/crypto/bn_conf.h include/crypto/dso_conf.h && \
