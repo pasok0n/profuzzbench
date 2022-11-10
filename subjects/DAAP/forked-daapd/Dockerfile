@@ -63,7 +63,7 @@ RUN mkdir $WORKDIR
 
 USER root
 RUN apt-get -y update && \
-    apt-get install \
+    apt-get -y install \
     build-essential git autotools-dev autoconf automake libtool gettext gawk \
     gperf bison flex libconfuse-dev libunistring-dev libsqlite3-dev \
     libavcodec-dev libavformat-dev libavfilter-dev libswscale-dev libavutil-dev \
