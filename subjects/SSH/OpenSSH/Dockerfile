@@ -89,7 +89,7 @@ ENV LD_LIBRARY_PATH="${WORKDIR}/openssl-install/lib"
 RUN cd ${WORKDIR} && \
     git clone https://github.com/vegard/openssh-portable.git openssh && \
     cd openssh && \
-    git checkout 7cfea58 && \
+    git checkout 96bd414 && \
     cp ${WORKDIR}/rand.inc . && \
     patch -p1 < ${WORKDIR}/rand.patch && \
     autoreconf && \
@@ -109,7 +109,7 @@ RUN cd ${WORKDIR} && \
 RUN cd ${WORKDIR} && \
     git clone https://github.com/vegard/openssh-portable.git openssh-gcov && \
     cd openssh-gcov && \
-    git checkout 7cfea58 && \
+    git checkout 96bd414 && \
     cp ${WORKDIR}/rand.inc . && \
     patch -p1 < ${WORKDIR}/rand.patch && \
     autoreconf && \
