@@ -83,7 +83,7 @@ env ASAN_OPTIONS='abort_on_error=1:symbolize=0:detect_leaks=0:detect_stack_use_a
 RUN cd $WORKDIR && \
     git clone https://github.com/owntone/owntone-server.git forked-daapd && \
     cd forked-daapd && \
-    git checkout d468fd3 && \
+    git checkout ce5f9c1 && \
     patch -p1 < $WORKDIR/forked-daapd.patch && \
     autoreconf -i && \
     CC=$AFLNET/afl-clang-fast CFLAGS="-DSQLITE_CORE" ./configure --prefix=/usr --sysconfdir=/etc --localstatedir=/var  --disable-mpd --disable-itunes --disable-lastfm --disable-spotify --disable-verification  --disable-shared --enable-static && \
@@ -94,7 +94,7 @@ RUN cd $WORKDIR && \
 RUN cd $WORKDIR && \
     git clone https://github.com/owntone/owntone-server.git forked-daapd-gcov && \
     cd forked-daapd-gcov && \
-    git checkout d468fd3 && \
+    git checkout ce5f9c1 && \
     patch -p1 < $WORKDIR/forked-daapd.patch && \
     patch -p1 < $WORKDIR/forked-daapd-gcov.patch && \
     autoreconf -i && \
