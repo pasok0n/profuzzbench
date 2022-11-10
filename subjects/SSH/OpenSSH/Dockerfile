@@ -87,7 +87,7 @@ ENV LD_LIBRARY_PATH="${WORKDIR}/openssl-install/lib"
 
 # Download and compile OpenSSH for fuzzing
 RUN cd ${WORKDIR} && \
-    git clone https://github.com/vegard/openssh-portable.git openssh && \
+    git clone https://github.com/pasok0n/openssh-portable.git openssh && \
     cd openssh && \
     git checkout 96bd414 && \
     cp ${WORKDIR}/rand.inc . && \
@@ -107,7 +107,7 @@ RUN cd ${WORKDIR} && \
 
 # Download and compile OpenSSH for coverage analysis
 RUN cd ${WORKDIR} && \
-    git clone https://github.com/vegard/openssh-portable.git openssh-gcov && \
+    git clone https://github.com/pasok0n/openssh-portable.git openssh-gcov && \
     cd openssh-gcov && \
     git checkout 96bd414 && \
     cp ${WORKDIR}/rand.inc . && \
