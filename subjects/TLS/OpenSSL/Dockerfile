@@ -74,7 +74,7 @@ RUN cd ${WORKDIR} && \
     git clone https://github.com/openssl/openssl.git && \
     cd openssl && \
     cp ${WORKDIR}/*.pem ./ && \
-    git checkout 19cc035 && \
+    git checkout 2c0ae1e && \
     patch -p1 < ${WORKDIR}/rand.patch && \
     CC=afl-clang-fast ./config no-shared --with-rand-seed=none && \
     CC=afl-clang-fast make include/openssl/configuration.h include/openssl/opensslv.h include/crypto/bn_conf.h include/crypto/dso_conf.h && \
@@ -86,7 +86,7 @@ RUN cd ${WORKDIR} && \
     git clone https://github.com/openssl/openssl.git openssl-gcov && \
     cd openssl-gcov && \
     cp ${WORKDIR}/*.pem ./ && \
-    git checkout 19cc035 && \
+    git checkout 2c0ae1e && \
     patch -p1 < ${WORKDIR}/rand.patch && \
     CFLAGS="-fprofile-arcs -ftest-coverage" LDFLAGS="-fprofile-arcs -ftest-coverage" ./config no-shared --with-rand-seed=none && \
     CFLAGS="-fprofile-arcs -ftest-coverage" LDFLAGS="-fprofile-arcs -ftest-coverage" make include/openssl/configuration.h include/openssl/opensslv.h include/crypto/bn_conf.h include/crypto/dso_conf.h && \
