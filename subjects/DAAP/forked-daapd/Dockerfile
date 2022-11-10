@@ -87,7 +87,7 @@ RUN cd $WORKDIR && \
     patch -p1 < $WORKDIR/forked-daapd.patch && \
     autoreconf -i && \
     CC=$AFLNET/afl-clang-fast CFLAGS="-DSQLITE_CORE" ./configure --prefix=/usr --sysconfdir=/etc --localstatedir=/var  --disable-mpd --disable-itunes --disable-lastfm --disable-spotify --disable-verification  --disable-shared --enable-static && \
-    AFL_USE_ASAN=1 make -C src/ SMARTPL.c DAAP2SQL.c DAAPLexer.c RSPLexer.c RSP2SQL.c && \
+    AFL_USE_ASAN=1 make && \
     AFL_USE_ASAN=1 make clean all $MAKE_OPT
 
 # Download and compile forked-daapd for code coverage analysis
@@ -99,7 +99,7 @@ RUN cd $WORKDIR && \
     patch -p1 < $WORKDIR/forked-daapd-gcov.patch && \
     autoreconf -i && \
     CFLAGS="-DSQLITE_CORE -fprofile-arcs -ftest-coverage" LDFLAGS="-fprofile-arcs -ftest-coverage" ./configure --prefix=/usr --sysconfdir=/etc --localstatedir=/var  --disable-mpd --disable-itunes --disable-lastfm --disable-spotify --disable-verification  --disable-shared --enable-static && \
-    make -C src/ SMARTPL2SQL.c SMARTPL.c DAAP2SQL.c DAAPLexer.c RSPLexer.c RSP2SQL.c && \
+    make && \
     make clean all $MAKE_OPT
 
 
