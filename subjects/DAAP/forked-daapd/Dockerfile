@@ -69,7 +69,7 @@ RUN apt-get -y update && \
     libavcodec-dev libavformat-dev libavfilter-dev libswscale-dev libavutil-dev \
     libasound2-dev libmxml-dev libgcrypt20-dev libavahi-client-dev zlib1g-dev \
     libevent-dev libplist-dev libsodium-dev libjson-c-dev libwebsockets-dev \
-    libcurl4-openssl-dev libprotobuf-c-dev
+    libcurl4-openssl-dev libprotobuf-c-dev avahi-daemon
 USER ubuntu
 
 COPY --chown=ubuntu:ubuntu forked-daapd.patch ${WORKDIR}/forked-daapd.patch
@@ -112,7 +112,7 @@ RUN touch /var/log/forked-daapd.log && \
 RUN touch /var/run/forked-daapd.pid && \
     chown ubuntu.root /var/run/forked-daapd.pid
 
-#RUN update-rc.d avahi-daemon defaults
+RUN update-rc.d avahi-daemon defaults
 
 RUN mkdir /usr/share/forked-daapd/ && \
     cp -R $WORKDIR/forked-daapd/htdocs /usr/share/forked-daapd/htdocs
