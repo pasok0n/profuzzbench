@@ -72,7 +72,7 @@ RUN mkdir $WORKDIR
 RUN cd ${WORKDIR} && \
     git clone https://github.com/proftpd/proftpd.git && \
     cd proftpd && \
-    git checkout 4017eff8 && \
+    git checkout 2e93b54 && \
     CC="afl-clang-fast" CXX="afl-clang-fast++" ./configure --enable-devel=nodaemon:nofork && \
     AFL_USE_ASAN=1 make $MAKE_OPT
 
@@ -80,7 +80,7 @@ RUN cd ${WORKDIR} && \
 RUN cd ${WORKDIR} && \
     git clone https://github.com/proftpd/proftpd.git proftpd-gcov && \
     cd proftpd-gcov && \
-    git checkout 4017eff8 && \
+    git checkout 2e93b54 && \
     CFLAGS="-fprofile-arcs -ftest-coverage" CPPFLAGS="-fprofile-arcs -ftest-coverage" CXXFLAGS="-fprofile-arcs -ftest-coverage" LDFLAGS="-fprofile-arcs -ftest-coverage" ./configure --enable-devel=nodaemon:nofork && \
     make $MAKE_OPT
 
