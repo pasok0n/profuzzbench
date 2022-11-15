@@ -1,6 +1,6 @@
-diff -u bftpd/commands.c bftpd-patch/commands.c
+diff -u bftpd/commands.c bftpd/commands.c
 --- bftpd/commands.c	2022-01-28 18:55:18
-+++ bftpd-patch/commands.c	2022-11-14 13:26:27
++++ bftpd/commands.c	2022-11-14 13:26:27
 @@ -142,7 +142,7 @@
  	memset(&local, 0, sizeof(local));
  
@@ -152,11 +152,11 @@ diff -u bftpd/commands.c bftpd-patch/commands.c
          alarm(control_timeout);
  	control_printf(SL_SUCCESS, "226 Directory list has been submitted.");
  }
-Common subdirectories: bftpd/debian and bftpd-patch/debian
-Common subdirectories: bftpd/doc and bftpd-patch/doc
+Common subdirectories: bftpd/debian and bftpd/debian
+Common subdirectories: bftpd/doc and bftpd/doc
 diff -u bftpd/main.c bftpd-patch/main.c
 --- bftpd/main.c	2022-01-28 18:56:37
-+++ bftpd-patch/main.c	2022-11-14 13:37:28
++++ bftpd/main.c	2022-11-14 13:37:28
 @@ -295,7 +295,7 @@
  			 * we have to check if accept() returned an error.
  			 */
