@@ -22,7 +22,7 @@ ENV PATH=${STATEAFL}:${PATH}
 RUN cd ${WORKDIR} && \
     git clone https://github.com/pasok0n/openssh-portable.git openssh-stateafl && \
     cd openssh-stateafl && \
-    git checkout 96bd414 && \
+    git checkout V_9_1 && \
     cp ${WORKDIR}/rand.inc . && \
     patch -p1 < ${WORKDIR}/rand.patch && \
     autoreconf && \
