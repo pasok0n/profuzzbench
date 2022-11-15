@@ -169,7 +169,7 @@ diff -u bftpd-gcov/commands.c bftpd-patch/commands.c
 Common subdirectories: bftpd/debian and bftpd-patch/debian
 Common subdirectories: bftpd/doc and bftpd-patch/doc
 diff -u bftpd-gcov/login.c bftpd-patch/login.c
---- bftpd-gcov/login.c	2022-11-14 13:46:21
+--- bftpd-gcov/login.c	2022-01-14 13:46:21
 +++ bftpd-patch/login.c	2022-07-08 21:41:12
 @@ -388,8 +388,7 @@
  					strerror(errno));
