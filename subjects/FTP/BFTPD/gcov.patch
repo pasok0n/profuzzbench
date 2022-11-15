@@ -1,5 +1,5 @@
-diff -u bftpd/Makefile bftpd-patch/Makefile
---- bftpd/Makefile	2022-11-14 13:47:10
+diff -u bftpd-gcov/Makefile bftpd-patch/Makefile
+--- bftpd-gcov/Makefile	2022-11-14 13:47:10
 +++ bftpd-patch/Makefile	2022-01-28 19:01:47
 @@ -3,8 +3,8 @@
  CC?=gcc
@@ -12,8 +12,8 @@ diff -u bftpd/Makefile bftpd-patch/Makefile
  mandir=${prefix}/man
  sbindir=${exec_prefix}/sbin
  DESTDIR=
-diff -u bftpd/commands.c bftpd-patch/commands.c
---- bftpd/commands.c	2022-01-28 18:55:18
+diff -u bftpd-gcov/commands.c bftpd-patch/commands.c
+--- bftpd-gcov/commands.c	2022-01-28 18:55:18
 +++ bftpd-patch/commands.c	2022-11-14 13:26:27
 @@ -142,7 +142,7 @@
  	memset(&local, 0, sizeof(local));
@@ -168,8 +168,8 @@ diff -u bftpd/commands.c bftpd-patch/commands.c
  }
 Common subdirectories: bftpd/debian and bftpd-patch/debian
 Common subdirectories: bftpd/doc and bftpd-patch/doc
-diff -u bftpd/login.c bftpd-patch/login.c
---- bftpd/login.c	2022-11-14 13:46:21
+diff -u bftpd-gcov/login.c bftpd-patch/login.c
+--- bftpd-gcov/login.c	2022-11-14 13:46:21
 +++ bftpd-patch/login.c	2021-07-08 21:41:12
 @@ -388,8 +388,7 @@
  					strerror(errno));
@@ -197,8 +197,8 @@ diff -u bftpd/login.c bftpd-patch/login.c
                  if ( chdir("/") )
                  {
                      control_printf(SL_FAILURE, "421 Unable to change working directory.\r\n");
-diff -u bftpd/main.c bftpd-patch/main.c
---- bftpd/main.c	2022-01-28 18:56:37
+diff -u bftpd-gcov/main.c bftpd-patch/main.c
+--- bftpd-gcov/main.c	2022-01-28 18:56:37
 +++ bftpd-patch/main.c	2022-11-14 13:37:28
 @@ -295,7 +295,7 @@
  			 * we have to check if accept() returned an error.
