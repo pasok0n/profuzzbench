@@ -78,7 +78,7 @@ env ASAN_OPTIONS='abort_on_error=1:symbolize=0:detect_leaks=0:detect_stack_use_a
 RUN cd ${WORKDIR} && \
     git clone https://github.com/openssl/openssl openssl && \
     cd openssl && \
-    git checkout V_9_1 && \
+    git checkout 12ad22d && \
     ./Configure linux-x86_64-clang shared --prefix=$WORKDIR/openssl-install && \
     make $MAKE_OPT && \
     make install
@@ -109,7 +109,7 @@ RUN cd ${WORKDIR} && \
 RUN cd ${WORKDIR} && \
     git clone https://github.com/pasok0n/openssh-portable.git openssh-gcov && \
     cd openssh-gcov && \
-    git checkout 96bd414 && \
+    git checkout V_9_1 && \
     cp ${WORKDIR}/rand.inc . && \
     patch -p1 < ${WORKDIR}/rand.patch && \
     autoreconf && \
