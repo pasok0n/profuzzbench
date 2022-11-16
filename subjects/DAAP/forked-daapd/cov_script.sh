@@ -34,7 +34,7 @@ for f in $(echo $folder/$testdir/*.raw); do
   time=$(stat -c %Y $f)
 
   (sleep 1 && $replayer $f HTTP $pno 100 10000 > /dev/null 2>&1) &
-  timeout -k 0 -s SIGUSR1 10s ./forked-daapd-gcov/src/forked-daapd -d 0 -c ./forked-daapd.conf -f > /dev/null 2>&1
+  timeout -k 0 -s SIGUSR1 10s ./forked-daapd-gcov/src/owntone -d 0 -c ./forked-daapd.conf -f > /dev/null 2>&1
   
   wait
   cov_data=$(gcovr -r forked-daapd-gcov -s | grep "[lb][a-z]*:")
@@ -52,7 +52,7 @@ for f in $(echo $folder/$testdir/id*); do
   time=$(stat -c %Y $f)
 
   (sleep 1 && $replayer $f HTTP $pno 100 10000 > /dev/null 2>&1) &
-  timeout -k 0 -s SIGUSR1 10s ./forked-daapd-gcov/src/forked-daapd -d 0 -c ./forked-daapd.conf -f > /dev/null 2>&1
+  timeout -k 0 -s SIGUSR1 10s ./forked-daapd-gcov/src/owntone -d 0 -c ./forked-daapd.conf -f > /dev/null 2>&1
 
   wait
   count=$(expr $count + 1)
