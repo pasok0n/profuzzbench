@@ -348,12 +348,12 @@ do
 
             if [[ $FUZZER == "aflnet" ]] || [[ $FUZZER == "all" ]]
             then
-                profuzzbench_exec_common.sh forked-daapd $NUM_CONTAINERS results-forked-daapd aflnet out-forked-daapd-aflnet "-P HTTP -D 200000 -m none -q 3 -s 3 -E -K -t ${TEST_TIMEOUT}" $TIMEOUT $SKIPCOUNT
+                profuzzbench_exec_common.sh forked-daapd $NUM_CONTAINERS results-forked-daapd aflnet out-forked-daapd-aflnet "-P HTTP -D 200000 -m none -q 3 -s 3 -K -t ${TEST_TIMEOUT}" $TIMEOUT $SKIPCOUNT
             fi
 
             if [[ $FUZZER == "stateafl" ]] || [[ $FUZZER == "all" ]]
             then
-                profuzzbench_exec_common.sh forked-daapd-stateafl $NUM_CONTAINERS results-forked-daapd stateafl out-forked-daapd-stateafl "-P HTTP -D 200000 -m none -q 3 -s 3 -E -K -u /home/ubuntu/experiments/forked-daapd/src/forked-daapd -t ${TEST_TIMEOUT}" $TIMEOUT $SKIPCOUNT
+                profuzzbench_exec_common.sh forked-daapd-stateafl $NUM_CONTAINERS results-forked-daapd stateafl out-forked-daapd-stateafl "-P HTTP -D 200000 -m none -q 3 -s 3 -K -u /home/ubuntu/experiments/forked-daapd/src/owntone -t ${TEST_TIMEOUT}" $TIMEOUT $SKIPCOUNT
             fi
 
             if [[ $FUZZER == "aflnwe" ]] || [[ $FUZZER == "all" ]]
