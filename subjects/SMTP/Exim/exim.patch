@@ -17,3 +17,13 @@
 +DISABLE_TLS=yes
  # Unless you do this, you must define one of USE_OPENSSL or USE_GNUTLS
  # below.
+ 
+ @@ -277,7 +277,7 @@
+ 
+ 
+ # Uncomment the following line to remove support for TLS Resumption
+-# DISABLE_TLS_RESUME=yes
++DISABLE_TLS_RESUME=yes
+ 
+ 
+ ###############################################################################
