@@ -9,3 +9,11 @@
  
  # If you specify EXIM_USER as a name, this is looked up at build time, and the
  # uid number is built into the binary. However, you can specify that this
+@@ -203,7 +203,7 @@
+ 
+ # Uncomment the following lines if you want
+ # to build Exim without any TLS support (either OpenSSL or GnuTLS):
+- DISABLE_TLS=yes
++DISABLE_TLS=yes
+ # Unless you do this, you must define one of USE_OPENSSL or USE_GNUTLS
+ # below.
