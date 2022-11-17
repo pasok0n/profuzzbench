@@ -1,6 +1,6 @@
---- Local/Makefile	2020-03-31 00:50:50.853905865 +0000
-+++ Local/Makefile	2020-03-31 00:57:08.740454002 +0000
- @@ -132,7 +132,7 @@
+--- Makefile	2022-11-17 14:43:00
++++ Makefile-patch	2022-11-17 14:43:14
+@@ -132,7 +132,7 @@
  # deliveries. (Local deliveries run as various non-root users, typically as the
  # owner of a local mailbox.) Specifying these values as root is not supported.
  
@@ -13,10 +13,11 @@
  
  # Uncomment the following lines if you want
  # to build Exim without any TLS support (either OpenSSL or GnuTLS):
-- DISABLE_TLS=yes
+-# DISABLE_TLS=yes
 +DISABLE_TLS=yes
  # Unless you do this, you must define one of USE_OPENSSL or USE_GNUTLS
  # below.
+ 
 @@ -277,7 +277,7 @@
  
  
@@ -26,3 +27,4 @@
  
  
  ###############################################################################
+
