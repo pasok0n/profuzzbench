@@ -244,10 +244,10 @@ index 8531112c0..ed2031557 100644
  if ((fd = spool_open_temp(tname)) < 0)
    return spool_write_error(where, errmsg, US"open", NULL, NULL);
 diff --git a/src/src/store.h b/src/src/store.h
-index 58561ac28..b339a303c 100644
+index 58561ac28..1ab1a2d33 100644
 --- a/src/src/store.h
 +++ b/src/src/store.h
-@@ -44,19 +44,13 @@ tracing information for debugging. */
+@@ -44,19 +44,14 @@ tracing information for debugging. */
  #define store_extend(addr, tainted, old, new) \
    store_extend_3(addr, tainted, old, new, __FUNCTION__, __LINE__)
  
@@ -257,16 +257,15 @@ index 58561ac28..b339a303c 100644
  /* store_get & store_get_perm are in local_scan.h */
 -#define store_malloc(size) \
 -	store_malloc_3(size, __FUNCTION__, __LINE__)
--#define store_mark(void) \
--	store_mark_3(__FUNCTION__, __LINE__)
++#define store_malloc(size) malloc(size)
+ #define store_mark(void) \
+ 	store_mark_3(__FUNCTION__, __LINE__)
 -#define store_newblock(addr, tainted, newsize, datalen) \
 -	store_newblock_3(addr, tainted, newsize, datalen, __FUNCTION__, __LINE__)
 -#define store_release_above(addr) \
 -	store_release_above_3(addr, __FUNCTION__, __LINE__)
 -#define store_reset(mark) \
 -	store_reset_3(mark, __FUNCTION__, __LINE__)
-+#define store_malloc(size) malloc(size)
-+#define store_mark(void)
 +#define store_newblock(addr, tainted, newsize, datalen) malloc(newsize)
 +#define store_release_above(addr) free(addr)
 +#define store_reset(mark)
