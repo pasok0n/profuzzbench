@@ -1,4 +1,4 @@
---- src/EDITME	2020-03-31 00:50:50.853905865 +0000
+--- Local/Makefile	2020-03-31 00:50:50.853905865 +0000
 +++ Local/Makefile	2020-03-31 00:57:08.740454002 +0000
  @@ -132,7 +132,7 @@
  # deliveries. (Local deliveries run as various non-root users, typically as the
@@ -9,7 +9,6 @@
  
  # If you specify EXIM_USER as a name, this is looked up at build time, and the
  # uid number is built into the binary. However, you can specify that this
-
 @@ -203,7 +203,7 @@
  
  # Uncomment the following lines if you want
@@ -18,7 +17,6 @@
 +DISABLE_TLS=yes
  # Unless you do this, you must define one of USE_OPENSSL or USE_GNUTLS
  # below.
- 
 @@ -277,7 +277,7 @@
  
  
