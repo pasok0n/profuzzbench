@@ -271,12 +271,12 @@ do
 
             if [[ $FUZZER == "aflnet" ]] || [[ $FUZZER == "all" ]]
             then
-                profuzzbench_exec_common.sh openssl $NUM_CONTAINERS results-openssl aflnet out-openssl-aflnet "-P TLS -D 10000 -q 3 -s 3 -E -K -R -W 100 -m none -t ${TEST_TIMEOUT}" $TIMEOUT $SKIPCOUNT
+                profuzzbench_exec_common.sh openssl $NUM_CONTAINERS results-openssl aflnet out-openssl-aflnet "-P TLS -D 10000 -q 3 -s 3 -K -R -W 100 -m none -t ${TEST_TIMEOUT}" $TIMEOUT $SKIPCOUNT
             fi
 
             if [[ $FUZZER == "stateafl" ]] || [[ $FUZZER == "all" ]]
             then
-                profuzzbench_exec_common.sh openssl-stateafl $NUM_CONTAINERS results-openssl stateafl out-openssl-stateafl "-P TLS -D 10000 -q 3 -s 3 -E -K -R -W 100 -m none -u /home/ubuntu/experiments/openssl/apps/openssl -t ${TEST_TIMEOUT}" $TIMEOUT $SKIPCOUNT
+                profuzzbench_exec_common.sh openssl-stateafl $NUM_CONTAINERS results-openssl stateafl out-openssl-stateafl "-P TLS -D 10000 -q 3 -s 3 -K -R -W 100 -m none -u /home/ubuntu/experiments/openssl/apps/openssl -t ${TEST_TIMEOUT}" $TIMEOUT $SKIPCOUNT
             fi
 
             if [[ $FUZZER == "aflnwe" ]] || [[ $FUZZER == "all" ]]

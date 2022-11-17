@@ -74,10 +74,10 @@ RUN cd ${WORKDIR} && \
     git clone https://github.com/openssl/openssl.git && \
     cd openssl && \
     cp ${WORKDIR}/*.pem ./ && \
-    git checkout 1290581 && \
+    git checkout f868abc && \
     patch -p1 < ${WORKDIR}/rand.patch && \
     CC=afl-clang-fast ./config no-shared --with-rand-seed=none && \
-    CC=afl-clang-fast make include/openssl/configuration.h include/openssl/opensslv.h include/crypto/bn_conf.h include/crypto/dso_conf.h && \
+    CC=afl-clang-fast make && \
     AFL_USE_ASAN=1 CC=afl-clang-fast make apps/openssl $MAKE_OPT
 
 
@@ -86,10 +86,10 @@ RUN cd ${WORKDIR} && \
     git clone https://github.com/openssl/openssl.git openssl-gcov && \
     cd openssl-gcov && \
     cp ${WORKDIR}/*.pem ./ && \
-    git checkout 1290581 && \
+    git checkout f868abc && \
     patch -p1 < ${WORKDIR}/rand.patch && \
     CFLAGS="-fprofile-arcs -ftest-coverage" LDFLAGS="-fprofile-arcs -ftest-coverage" ./config no-shared --with-rand-seed=none && \
-    CFLAGS="-fprofile-arcs -ftest-coverage" LDFLAGS="-fprofile-arcs -ftest-coverage" make include/openssl/configuration.h include/openssl/opensslv.h include/crypto/bn_conf.h include/crypto/dso_conf.h && \
+    CFLAGS="-fprofile-arcs -ftest-coverage" LDFLAGS="-fprofile-arcs -ftest-coverage" make && \
     CFLAGS="-fprofile-arcs -ftest-coverage" LDFLAGS="-fprofile-arcs -ftest-coverage" make apps/openssl $MAKE_OPT
 
 COPY --chown=ubuntu:ubuntu in-tls ${WORKDIR}/in-tls

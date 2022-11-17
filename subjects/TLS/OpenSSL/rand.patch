@@ -6,7 +6,7 @@ index f35d57f264..eb3e8e2045 100644
  #define INCLUDE_FUNCTION_TABLE
  #include "progs.h"
  
-+#include "../fuzz/fuzz_rand.c"
++#include "../fuzz/rand.inc"
 +
  /* Structure to hold the number of columns to be displayed and the
   * field width used to display them.
