@@ -1,6 +1,6 @@
 --- src/EDITME	2020-03-31 00:50:50.853905865 +0000
 +++ Local/Makefile	2020-03-31 00:57:08.740454002 +0000
-@@ -135,7 +135,7 @@
+ @@ -132,7 +132,7 @@
  # deliveries. (Local deliveries run as various non-root users, typically as the
  # owner of a local mailbox.) Specifying these values as root is not supported.
  
@@ -18,7 +18,7 @@
  # Unless you do this, you must define one of USE_OPENSSL or USE_GNUTLS
  # below.
  
- @@ -277,7 +277,7 @@
+@@ -277,7 +277,7 @@
  
  
  # Uncomment the following line to remove support for TLS Resumption
