@@ -73,7 +73,6 @@ RUN apt-get -y install \
     libgdbm-dev
 
 COPY --chown=ubuntu:ubuntu exim.patch ${WORKDIR}/exim.patch
-COPY --chown=ubuntu:ubuntu exim-rand.patch ${WORKDIR}/exim-rand.patch
 COPY --chown=ubuntu:ubuntu exim-log-bug.patch ${WORKDIR}/exim-log-bug.patch
 COPY --chown=ubuntu:ubuntu exim.configure.patch ${WORKDIR}/exim.configure.patch
 
