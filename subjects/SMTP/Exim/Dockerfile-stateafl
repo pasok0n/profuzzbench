@@ -22,10 +22,10 @@ RUN cd ${WORKDIR} && \
     git clone https://github.com/Exim/exim exim-stateafl && \
     cd exim-stateafl && \
     git checkout 73e85c6 && \
-    patch -p1 < ${WORKDIR}/exim.patch && \
+    patch -p1 < ${WORKDIR}/exim-stateafl.patch && \
     patch -p1 < ${WORKDIR}/exim-log-bug.patch && \
     cd src; mkdir Local; cp src/EDITME Local/Makefile && \
-    make CC=${STATEAFL}/afl-clang-fast clean all $MAKE_OPT
+    AFL_USE_ASAN=1 make CC=${STATEAFL}/afl-clang-fast clean all install $MAKE_OPT
 
 
 COPY --chown=ubuntu:ubuntu in-smtp-replay ${WORKDIR}/in-smtp-replay

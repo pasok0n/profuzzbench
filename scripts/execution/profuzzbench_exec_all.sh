@@ -145,7 +145,7 @@ do
 
             if [[ $FUZZER == "stateafl" ]] || [[ $FUZZER == "all" ]]
             then
-                profuzzbench_exec_common.sh exim-stateafl $NUM_CONTAINERS results-exim stateafl out-exim-stateafl "-P SMTP -D 10000 -q 3 -s 3 -E -K -W 100 -m none -u /home/ubuntu/experiments/exim/src/build-Linux-x86_64/exim -t ${TEST_TIMEOUT}" $TIMEOUT $SKIPCOUNT
+                profuzzbench_exec_common.sh exim-stateafl $NUM_CONTAINERS results-exim stateafl out-exim-stateafl "-P SMTP -D 10000 -q 3 -s 3 -K -W 100 -m none -u /home/ubuntu/experiments/exim/src/build-Linux-x86_64/exim -t ${TEST_TIMEOUT}" $TIMEOUT $SKIPCOUNT
             fi
 
             if [[ $FUZZER == "aflnwe" ]] || [[ $FUZZER == "all" ]]
