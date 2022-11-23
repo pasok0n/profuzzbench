@@ -1,8 +1,8 @@
 diff --git a/dcmqrdb/apps/dcmqrscp.cc b/dcmqrdb/apps/dcmqrscp.cc
-index 591fb1ff4..3f2539036 100644
+index 0ddc933c1..a91b3ae29 100644
 --- a/dcmqrdb/apps/dcmqrscp.cc
 +++ b/dcmqrdb/apps/dcmqrscp.cc
-@@ -91,7 +91,7 @@ static char rcsid[] = "$dcmtk: " OFFIS_CONSOLE_APPLICATION " v"
+@@ -83,7 +83,7 @@ static char rcsid[] = "$dcmtk: " OFFIS_CONSOLE_APPLICATION " v"
  
  #define APPLICATIONTITLE "DCMQRSCP"
  

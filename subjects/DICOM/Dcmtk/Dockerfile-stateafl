@@ -24,7 +24,7 @@ COPY --chown=ubuntu:ubuntu in-dicom-replay ${WORKDIR}/in-dicom-replay
 RUN cd $WORKDIR && \
     git clone https://github.com/DCMTK/dcmtk dcmtk-stateafl && \
     cd dcmtk-stateafl && \
-    git checkout 7f8564c && \
+    git checkout a137f1a && \
     patch -p1 < $WORKDIR/fuzzing.patch && \
     patch -p1 < $WORKDIR/buffer.patch && \
     mkdir build && cd build && \
