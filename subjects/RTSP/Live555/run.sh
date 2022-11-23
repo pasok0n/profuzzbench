@@ -12,7 +12,7 @@ strstr() {
 }
 
 #Commands for afl-based fuzzers (e.g., aflnet, aflnwe)
-if $(strstr $FUZZER "afl"); then
+if $(strstr $FUZZER "afl") || $(strstr $FUZZER "snapfuzz"); then
 
   TARGET_DIR=${TARGET_DIR:-"live555"}
   INPUTS=${WORKDIR}/in-rtsp
@@ -22,10 +22,17 @@ if $(strstr $FUZZER "afl"); then
     source ${WORKDIR}/run-${FUZZER}
   fi
 
+  # snapfuzz plugin, so i don't have to type it everytime in
+  if $(strstr $FUZZER "snapfuzz"); then
+    plugin="-A /home/ubuntu/SnapFuzz/SaBRe/build/plugins/snapfuzz/libsnapfuzz.so"
+  else
+    plugin=""
+  fi
+
   #Step-1. Do Fuzzing
   #Move to fuzzing folder
   cd $WORKDIR/${TARGET_DIR}/testProgs
-  timeout -k 0 --preserve-status $TIMEOUT /home/ubuntu/${FUZZER}/afl-fuzz -d -i ${INPUTS} -x ${WORKDIR}/rtsp.dict -o $OUTDIR -N tcp://127.0.0.1/8554 $OPTIONS ./testOnDemandRTSPServer 8554
+  timeout -k 0 --preserve-status $TIMEOUT /home/ubuntu/${FUZZER}/afl-fuzz -d -i ${INPUTS} -x ${WORKDIR}/rtsp.dict -o $OUTDIR -N tcp://127.0.0.1/8554 $plugin $OPTIONS ./testOnDemandRTSPServer 8554
 
   STATUS=$?
 

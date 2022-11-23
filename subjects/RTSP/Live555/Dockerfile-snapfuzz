@@ -1,0 +1,41 @@
+from live555
+
+USER root
+RUN apt-get -y update && apt-get -y install make \
+    cmake gettext libtool libsqlite3-dev \
+    gettext-base libelf-dev libc6-dbg cmake-curses-gui
+
+USER ubuntu
+WORKDIR /home/ubuntu
+#Snapfuzz itself
+ENV SNAPFUZZ="/home/ubuntu/SnapFuzz"
+#Modified AFLnet 
+ENV AFLNET="/home/ubuntu/snapfuzz" 
+
+#SnapFuzz
+RUN git clone --recurse-submodules https://github.com/srg-imperial/SnapFuzz.git $SNAPFUZZ && \
+    cd $SNAPFUZZ/SaBRe/plugins && \
+    ln -s ../../snapfuzz snapfuzz && \
+    cd .. && mkdir build && cd build && \
+    cmake .. && make $MAKE_OPT
+
+#SnapFuzz's modified version of AFLnet 
+RUN git clone https://github.com/andronat/aflnet.git --branch mymaster --single-branch $AFLNET && \
+    cd $AFLNET && \
+    make clean all && \
+    cd llvm_mode && \
+    make
+
+ENV PATH="${PATH}:${AFLNET}:/home/ubuntu/.local/bin:${WORKDIR}"
+ENV AFL_PATH="${AFLNET}"
+
+COPY --chown=ubuntu:ubuntu fuzzing-snapfuzz.patch ${WORKDIR}/fuzzing-snapfuzz.patch
+
+RUN cd $WORKDIR/live555 && \
+    git apply -R $WORKDIR/fuzzing.patch && \
+    patch -p1 < $WORKDIR/fuzzing-snapfuzz.patch && \
+    ./genMakefiles linux && \
+    AFL_USE_ASAN=1 make clean all $MAKE_OPT || make all
+
+RUN cd $WORKDIR/live555/testProgs && \
+    cp $SNAPFUZZ/SaBRe/build/sabre .
