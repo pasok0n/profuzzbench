@@ -12,7 +12,7 @@ strstr() {
 }
 
 #Commands for afl-based fuzzers (e.g., aflnet, aflnwe)
-if $(strstr $FUZZER "afl"); then
+if $(strstr $FUZZER "afl") || $(strstr $FUZZER "snapfuzz"); then
 
   # Run fuzzer-specific commands (if any)
   if [ -e ${WORKDIR}/run-${FUZZER} ]; then
@@ -22,11 +22,21 @@ if $(strstr $FUZZER "afl"); then
   TARGET_DIR=${TARGET_DIR:-"LightFTP"}
   INPUTS=${INPUTS:-"${WORKDIR}/in-ftp"}
 
+  #Snapfuzzplugin, so you don't have to give the path everytime
+  #Snapfuzz doesn't need a cleanup script
+  if $(strstr $FUZZER "snapfuzz"); then
+    plugin="-A /home/ubuntu/SnapFuzz/SaBRe/build/plugins/snapfuzz/libsnapfuzz.so"
+    clean=""
+  else
+    plugin=""
+    clean="-c ${WORKDIR}/ftpclean"
+  fi
+
   #Step-1. Do Fuzzing
   #Move to fuzzing folder
   cd $WORKDIR/${TARGET_DIR}/Source/Release
   echo "$WORKDIR/${TARGET_DIR}/Source/Release"
-  timeout -k 0 --preserve-status $TIMEOUT /home/ubuntu/${FUZZER}/afl-fuzz -d -i ${INPUTS} -x ${WORKDIR}/ftp.dict -o $OUTDIR -N tcp://127.0.0.1/2200 $OPTIONS -c ${WORKDIR}/ftpclean ./fftp fftp.conf 2200
+  timeout -k 0 --preserve-status $TIMEOUT /home/ubuntu/${FUZZER}/afl-fuzz -d -i ${INPUTS} -x ${WORKDIR}/ftp.dict -o $OUTDIR -N tcp://127.0.0.1/2200 $plugin $OPTIONS $clean ./fftp fftp.conf 2200
 
   STATUS=$?
 

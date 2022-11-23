@@ -1,0 +1,49 @@
+from lightftp
+
+USER root
+RUN apt-get -y update && apt-get -y install make \
+    cmake gettext libtool libsqlite3-dev \
+    gettext-base libelf-dev libc6-dbg cmake-curses-gui
+
+USER ubuntu
+WORKDIR /home/ubuntu
+#Snapfuzz itself
+ENV SNAPFUZZ="/home/ubuntu/SnapFuzz"
+#Modified AFLnet 
+ENV AFLNET="/home/ubuntu/snapfuzz" 
+
+#SnapFuzz
+RUN git clone --recurse-submodules https://github.com/srg-imperial/SnapFuzz.git $SNAPFUZZ && \
+    cd $SNAPFUZZ/SaBRe/plugins && \
+    ln -s ../../snapfuzz snapfuzz && \
+    cd .. && mkdir build && cd build && \
+    cmake .. && make $MAKE_OPT
+
+#SnapFuzz's modified version of AFLnet 
+RUN git clone https://github.com/andronat/aflnet.git --branch mymaster --single-branch $AFLNET && \
+    cd $AFLNET && \
+    make clean all && \
+    cd llvm_mode && \
+    make
+
+ENV PATH="${PATH}:${AFLNET}:/home/ubuntu/.local/bin:${WORKDIR}"
+ENV AFL_PATH="${AFLNET}"
+
+# Download and compile LightFTP for fuzzing
+RUN cd $WORKDIR && \
+    git clone https://github.com/hfiref0x/LightFTP.git LightFTP-snapfuzz && \
+    cd LightFTP-snapfuzz && \
+    git checkout 85c6a90 && \
+    patch -p1 < ${WORKDIR}/fuzzing.patch && \
+    cd Source/Release && \
+    AFL_USE_ASAN=1 CC=${AFLNET}/afl-clang-fast make clean all $MAKE_OPT
+
+# Set up LightFTP for fuzzing
+RUN cd ${WORKDIR}/LightFTP-snapfuzz/Source/Release && \
+    cp ${AFLNET}/tutorials/lightftp/fftp.conf ./ && \
+    cp ${AFLNET}/tutorials/lightftp/ftpclean.sh ./
+
+RUN cd $WORKDIR/LightFTP-snapfuzz/Source/Release && \
+    cp $SNAPFUZZ/SaBRe/build/sabre .
+
+COPY --chown=ubuntu:ubuntu run-snapfuzz.sh ${WORKDIR}/run-snapfuzz
