@@ -14,8 +14,9 @@ ENV STATEAFL_CFLAGS="-D__TRACER_USE_PTHREAD_MUTEX"
 ENV TRACE_CUSTOM_RECEIVE="evhttp_request_get_uri"
 ENV TRACE_CUSTOM_SEND="evhttp_send_reply"
 
-RUN git clone https://github.com/stateafl/stateafl.git $STATEAFL && \
+RUN git clone https://github.com/pasok0n/stateafl.git $STATEAFL && \
     cd $STATEAFL && \
+    git checkout test && \
     make clean all $MAKE_OPT && \
     rm as && \
     cd llvm_mode && CFLAGS="${STATEAFL_CFLAGS}" make $MAKE_OPT
@@ -26,14 +27,14 @@ ENV PATH=${STATEAFL}:${PATH}
 
 # Dedicated instrumented version for StateAFL
 RUN cd $WORKDIR && \
-    git clone https://github.com/ejurgensen/forked-daapd.git forked-daapd-stateafl && \
+    git clone https://github.com/owntone/owntone-server.git forked-daapd-stateafl && \
     cd forked-daapd-stateafl && \
-    git checkout 2ca10d9 && \
+    git checkout ce5f9c1 && \
     patch -p1 < $WORKDIR/forked-daapd.patch && \
     autoreconf -i && \
     CC=${STATEAFL}/afl-clang-fast CFLAGS="-DSQLITE_CORE" ./configure --prefix=/usr --sysconfdir=/etc --localstatedir=/var  --disable-mpd --disable-itunes --disable-lastfm --disable-spotify --disable-verification  --disable-shared --enable-static && \
-    make -C src/ SMARTPL2SQL.c SMARTPL.c DAAP2SQL.c DAAPLexer.c RSPLexer.c RSP2SQL.c && \
-    make clean all $MAKE_OPT
+    AFL_USE_ASAN=1 make && \
+    AFL_USE_ASAN=1 make clean all $MAKE_OPT
 
 COPY --chown=ubuntu:ubuntu in-daap-replay ${WORKDIR}/in-daap-replay
 COPY --chown=ubuntu:ubuntu run-stateafl.sh ${WORKDIR}/run-stateafl
