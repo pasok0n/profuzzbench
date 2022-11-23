@@ -1,0 +1,27 @@
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 9f8d268f3..9688c4e43 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -1,6 +1,9 @@
+ # Minimum CMake version required
+ cmake_minimum_required(VERSION 3.0.0...3.13.2 FATAL_ERROR)
+ 
++SET(CMAKE_C_COMPILER /home/ubuntu/snapfuzz/afl-clang-fast)
++SET(CMAKE_CXX_COMPILER /home/ubuntu/snapfuzz/afl-clang-fast++)
++
+ # Declare project
+ project(DCMTK)
+ 
+diff --git a/dcmqrdb/apps/dcmqrscp.cc b/dcmqrdb/apps/dcmqrscp.cc
+index 0ddc933c1..a91b3ae29 100644
+--- a/dcmqrdb/apps/dcmqrscp.cc
++++ b/dcmqrdb/apps/dcmqrscp.cc
+@@ -83,7 +83,7 @@ static char rcsid[] = "$dcmtk: " OFFIS_CONSOLE_APPLICATION " v"
+ 
+ #define APPLICATIONTITLE "DCMQRSCP"
+ 
+-const char *opt_configFileName = DEFAULT_CONFIGURATION_DIR "dcmqrscp.cfg";
++const char *opt_configFileName = "./dcmqrscp.cfg";
+ OFBool      opt_checkFindIdentifier = OFFalse;
+ OFBool      opt_checkMoveIdentifier = OFFalse;
+ OFCmdUnsignedInt opt_port = 0;

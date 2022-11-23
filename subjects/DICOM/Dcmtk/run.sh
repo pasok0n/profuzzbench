@@ -12,7 +12,7 @@ strstr() {
 }
 
 #Commands for afl-based fuzzers (e.g., aflnet, aflnwe)
-if $(strstr $FUZZER "afl"); then
+if $(strstr $FUZZER "afl") || $(strstr $FUZZER "snapfuzz"); then
 
   # Run fuzzer-specific commands (if any)
   if [ -e ${WORKDIR}/run-${FUZZER} ]; then
@@ -22,10 +22,20 @@ if $(strstr $FUZZER "afl"); then
   TARGET_DIR=${TARGET_DIR:-"dcmtk"}
   INPUTS=${INPUTS:-${WORKDIR}"/in-dicom"}
 
+  #Snapfuzzplugin, so you don't have to give the path everytime
+  #Snapfuzz doesn't need a cleanup script
+  if $(strstr $FUZZER "snapfuzz"); then
+    plugin="-A /home/ubuntu/SnapFuzz/SaBRe/build/plugins/snapfuzz/libsnapfuzz.so"
+    clean=""
+  else
+    plugin=""
+    clean="-c ${WORKDIR}/clean"
+  fi
+
   #Step-1. Do Fuzzing
   #Move to fuzzing folder
   cd $WORKDIR/${TARGET_DIR}/build/bin
-  timeout -k 0 --preserve-status $TIMEOUT /home/ubuntu/${FUZZER}/afl-fuzz -d -i ${INPUTS} -o $OUTDIR -N tcp://127.0.0.1/5158 $OPTIONS -c ${WORKDIR}/clean ./dcmqrscp --single-process
+  timeout -k 0 --preserve-status $TIMEOUT /home/ubuntu/${FUZZER}/afl-fuzz -d -i ${INPUTS} -o $OUTDIR -N tcp://127.0.0.1/5158 $plugin $OPTIONS $clean ./dcmqrscp --single-process
 
   STATUS=$?
 
