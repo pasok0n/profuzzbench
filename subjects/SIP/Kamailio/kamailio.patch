@@ -1,8 +1,8 @@
 diff --git a/src/main.c b/src/main.c
-index 9294bc3d94..b95cb74685 100644
+index 4ee5afe9d0..581125b0da 100644
 --- a/src/main.c
 +++ b/src/main.c
-@@ -1381,9 +1381,9 @@ int main_loop(void)
+@@ -1402,9 +1402,9 @@ int main_loop(void)
  		 * local configuration */
  		cfg_register_child(
  				1   /* main = udp listener */
@@ -14,7 +14,7 @@ index 9294bc3d94..b95cb74685 100644
  #endif
  			);
  		if (do_suid()==-1) goto error; /* try to drop privileges */
-@@ -1416,14 +1416,13 @@ int main_loop(void)
+@@ -1437,14 +1437,13 @@ int main_loop(void)
  
  #ifdef USE_SLOW_TIMER
  		/* we need another process to act as the "slow" timer*/
@@ -30,7 +30,7 @@ index 9294bc3d94..b95cb74685 100644
  					if (real_time&2)
  						set_rt_prio(rt_timer2_prio, rt_timer2_policy);
  
-@@ -1432,28 +1431,28 @@ int main_loop(void)
+@@ -1453,28 +1452,28 @@ int main_loop(void)
  				}else{
  					slow_timer_pid=pid;
  				}
@@ -62,7 +62,7 @@ index 9294bc3d94..b95cb74685 100644
  		/* main process, receive loop */
  		process_no=0; /*main process number*/
  		pt[process_no].pid=getpid();
-@@ -1484,12 +1483,12 @@ int main_loop(void)
+@@ -1511,12 +1510,12 @@ int main_loop(void)
  		/* Register the children that will keep updating their
  		 * local configuration. (udp/tcp/sctp listeneres
  		 * will be added later.) */
@@ -79,7 +79,7 @@ index 9294bc3d94..b95cb74685 100644
  
  		for(si=udp_listen;si;si=si->next){
  			/* create the listening socket (for each address)*/
-@@ -1725,12 +1724,12 @@ int main_loop(void)
+@@ -1803,12 +1802,12 @@ int main_loop(void)
  
  #ifdef USE_SLOW_TIMER
  		/* fork again for the "slow" timer process*/
@@ -93,7 +93,7 @@ index 9294bc3d94..b95cb74685 100644
  			if (real_time&2)
  				set_rt_prio(rt_timer2_prio, rt_timer2_policy);
  			if (arm_slow_timer()<0) goto error;
-@@ -1738,15 +1737,16 @@ int main_loop(void)
+@@ -1816,15 +1815,16 @@ int main_loop(void)
  		}else{
  			slow_timer_pid=pid;
  		}
@@ -111,7 +111,7 @@ index 9294bc3d94..b95cb74685 100644
  			if (real_time&1)
  				set_rt_prio(rt_timer1_prio, rt_timer1_policy);
  			if (arm_timer()<0) goto error;
-@@ -1756,6 +1756,7 @@ int main_loop(void)
+@@ -1834,6 +1834,7 @@ int main_loop(void)
  			LM_CRIT("Cannot start wtimer\n");
  			goto error;
  		}
@@ -119,7 +119,7 @@ index 9294bc3d94..b95cb74685 100644
  
  	/* init childs with rank==MAIN before starting tcp main (in case they want
  	 * to fork  a tcp capable process, the corresponding tcp. comm. fds in
-@@ -2302,7 +2303,8 @@ try_again:
+@@ -2486,7 +2487,8 @@ try_again:
  	}else{
  		LM_WARN("could not open /dev/urandom (%d)\n", errno);
  	}

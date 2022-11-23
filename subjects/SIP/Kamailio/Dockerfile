@@ -21,7 +21,8 @@ RUN apt-get -y update && \
     gdb \
     netcat \
     strace \
-    wget
+    wget \
+    libcap-dev
 
 # Add a new user ubuntu, pass: ubuntu
 RUN groupadd ubuntu && \
@@ -39,7 +40,7 @@ WORKDIR /home/ubuntu
 ARG MAKE_OPT
 
 # Set up fuzzers
-RUN git clone https://github.com/profuzzbench/aflnet.git && \
+RUN git clone https://github.com/pasok0n/aflnet.git && \
     cd aflnet && \
     make clean all $MAKE_OPT && \
     cd llvm_mode && make $MAKE_OPT
@@ -77,7 +78,7 @@ env ASAN_OPTIONS='abort_on_error=1:symbolize=0:detect_leaks=0:detect_stack_use_a
 RUN cd $WORKDIR && \
     git clone https://github.com/kamailio/kamailio.git && \
     cd kamailio && \
-    git checkout 2648eb3 && \
+    git checkout 54a9c15 && \
     patch -p1 < $WORKDIR/kamailio.patch && \
     CC=afl-clang-fast make MEMPKG=sys cfg && \
     AFL_USE_ASAN=1 CC=afl-clang-fast make all $MAKE_OPT
@@ -86,7 +87,7 @@ RUN cd $WORKDIR && \
 RUN cd $WORKDIR && \
     git clone https://github.com/pjsip/pjproject.git && \
     cd pjproject && \
-    git checkout bba95b8 && \
+    git checkout 9244fb0 && \
     patch -p1 < $WORKDIR/pjsip.patch && \
     ./configure && \
     make dep && make clean && make $MAKE_OPT
@@ -95,7 +96,7 @@ RUN cd $WORKDIR && \
 RUN cd $WORKDIR && \
     git clone https://github.com/kamailio/kamailio.git kamailio-gcov && \
     cd kamailio-gcov && \
-    git checkout 2648eb3 && \
+    git checkout 54a9c15 && \
     patch -p1 < $WORKDIR/kamailio.patch && \
     make CC_EXTRA_OPTS="-fprofile-arcs -ftest-coverage" LD_EXTRA_OPTS="-fprofile-arcs -ftest-coverage" MEMPKG=sys cfg && \
     make CC_EXTRA_OPTS="-fprofile-arcs -ftest-coverage" LD_EXTRA_OPTS="-fprofile-arcs -ftest-coverage" all $MAKE_OPT
