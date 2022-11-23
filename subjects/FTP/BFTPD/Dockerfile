@@ -21,7 +21,8 @@ RUN apt-get -y update && \
     gdb \
     netcat \
     strace \
-    wget
+    wget \
+    libcap-dev
 
 # Add a new user ubuntu, pass: ubuntu
 RUN groupadd ubuntu && \
@@ -39,7 +40,7 @@ WORKDIR /home/ubuntu
 ARG MAKE_OPT
 
 # Set up fuzzers
-RUN git clone https://github.com/profuzzbench/aflnet.git && \
+RUN git clone https://github.com/pasok0n/aflnet.git && \
     cd aflnet && \
     make clean all $MAKE_OPT && \
     cd llvm_mode && make $MAKE_OPT
@@ -69,8 +70,8 @@ env ASAN_OPTIONS='abort_on_error=1:symbolize=0:detect_leaks=0:detect_stack_use_a
 
 # Set up Bftpd for fuzzing
 RUN cd ${WORKDIR} && \
-    wget https://sourceforge.net/projects/bftpd/files/bftpd/bftpd-5.7/bftpd-5.7.tar.gz && \
-    tar -zxvf bftpd-5.7.tar.gz && \
+    wget https://sourceforge.net/projects/bftpd/files/bftpd/bftpd-6.1/bftpd-6.1.tar.gz && \
+    tar -zxvf bftpd-6.1.tar.gz && \
     cd bftpd && \
     patch -p1 < ${WORKDIR}/fuzzing.patch && \
     AFL_USE_ASAN=1 CC=afl-clang-fast make clean all $MAKE_OPT
@@ -79,7 +80,7 @@ RUN cd ${WORKDIR} && \
 # Set up Bftpd for coverage analysis
 RUN cd ${WORKDIR} && \
     mkdir ${WORKDIR}/bftpd-gcov && \
-    tar -zxvf bftpd-5.7.tar.gz -C ${WORKDIR}/bftpd-gcov --strip-components=1 && \
+    tar -zxvf bftpd-6.1.tar.gz -C ${WORKDIR}/bftpd-gcov --strip-components=1 && \
     cd ${WORKDIR}/bftpd-gcov && \
     patch -p1 < ${WORKDIR}/gcov.patch && \
     make $MAKE_OPT
