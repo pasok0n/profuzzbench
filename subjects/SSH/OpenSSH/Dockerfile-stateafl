@@ -20,9 +20,9 @@ ENV PATH=${STATEAFL}:${PATH}
 
 # Dedicated instrumented version for StateAFL
 RUN cd ${WORKDIR} && \
-    git clone https://github.com/vegard/openssh-portable.git openssh-stateafl && \
+    git clone https://github.com/pasok0n/openssh-portable.git openssh-stateafl && \
     cd openssh-stateafl && \
-    git checkout 7cfea58 && \
+    git checkout V_9_1 && \
     cp ${WORKDIR}/rand.inc . && \
     patch -p1 < ${WORKDIR}/rand.patch && \
     autoreconf && \

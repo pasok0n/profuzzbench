@@ -21,7 +21,8 @@ RUN apt-get -y update && \
     gdb \
     netcat \
     strace \
-    wget
+    wget \
+    libcap-dev
 
 # Add a new user ubuntu, pass: ubuntu
 RUN groupadd ubuntu && \
@@ -39,7 +40,7 @@ WORKDIR /home/ubuntu
 ARG MAKE_OPT
 
 # Set up fuzzers
-RUN git clone https://github.com/profuzzbench/aflnet.git && \
+RUN git clone https://github.com/pasok0n/aflnet.git && \
     cd aflnet && \
     make clean all $MAKE_OPT && \
     cd llvm_mode && make $MAKE_OPT
@@ -86,9 +87,9 @@ ENV LD_LIBRARY_PATH="${WORKDIR}/openssl-install/lib"
 
 # Download and compile OpenSSH for fuzzing
 RUN cd ${WORKDIR} && \
-    git clone https://github.com/vegard/openssh-portable.git openssh && \
+    git clone https://github.com/pasok0n/openssh-portable.git openssh && \
     cd openssh && \
-    git checkout 7cfea58 && \
+    git checkout V_9_1 && \
     cp ${WORKDIR}/rand.inc . && \
     patch -p1 < ${WORKDIR}/rand.patch && \
     autoreconf && \
@@ -106,9 +107,9 @@ RUN cd ${WORKDIR} && \
 
 # Download and compile OpenSSH for coverage analysis
 RUN cd ${WORKDIR} && \
-    git clone https://github.com/vegard/openssh-portable.git openssh-gcov && \
+    git clone https://github.com/pasok0n/openssh-portable.git openssh-gcov && \
     cd openssh-gcov && \
-    git checkout 7cfea58 && \
+    git checkout V_9_1 && \
     cp ${WORKDIR}/rand.inc . && \
     patch -p1 < ${WORKDIR}/rand.patch && \
     autoreconf && \
