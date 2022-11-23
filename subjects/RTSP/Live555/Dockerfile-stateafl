@@ -20,7 +20,7 @@ ENV PATH=${STATEAFL}:${PATH}
 RUN cd $WORKDIR && \
     git clone https://github.com/rgaufman/live555.git live555-stateafl && \
     cd live555-stateafl && \
-    git checkout ceeb4f4 && \
+    git checkout bbee4ed && \
     patch -p1 < $WORKDIR/fuzzing.patch && \
     ./genMakefiles linux && \
     make clean all $MAKE_OPT || make all
