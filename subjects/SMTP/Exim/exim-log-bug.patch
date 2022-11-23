@@ -1,9 +1,9 @@
 diff --git a/src/src/log.c b/src/src/log.c
-index ddd7137..fd214e1 100644
+index a7ef3d803..de8f82d6a 100644
 --- a/src/src/log.c
 +++ b/src/src/log.c
-@@ -1003,7 +1003,8 @@ if (  flags & LOG_MAIN
-     if (mainlog_datestamp != NULL)
+@@ -1076,7 +1076,8 @@ if (  flags & LOG_MAIN
+     if (mainlog_datestamp)
        {
        uschar *nowstamp = tod_stamp(string_datestamp_type);
 -      if (Ustrncmp (mainlog_datestamp, nowstamp, Ustrlen(nowstamp)) != 0)

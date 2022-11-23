@@ -21,7 +21,8 @@ RUN apt-get -y update && \
     gdb \
     netcat \
     strace \
-    wget
+    wget \
+    libcap-dev
 
 # Add a new user ubuntu, pass: ubuntu
 RUN groupadd ubuntu && \
@@ -39,7 +40,7 @@ WORKDIR /home/ubuntu
 ARG MAKE_OPT
 
 # Set up fuzzers
-RUN git clone https://github.com/profuzzbench/aflnet.git && \
+RUN git clone https://github.com/pasok0n/aflnet.git && \
     cd aflnet && \
     make clean all $MAKE_OPT && \
     cd llvm_mode && make $MAKE_OPT
@@ -72,7 +73,6 @@ RUN apt-get -y install \
     libgdbm-dev
 
 COPY --chown=ubuntu:ubuntu exim.patch ${WORKDIR}/exim.patch
-COPY --chown=ubuntu:ubuntu exim-rand.patch ${WORKDIR}/exim-rand.patch
 COPY --chown=ubuntu:ubuntu exim-log-bug.patch ${WORKDIR}/exim-log-bug.patch
 COPY --chown=ubuntu:ubuntu exim.configure.patch ${WORKDIR}/exim.configure.patch
 
@@ -83,22 +83,20 @@ env ASAN_OPTIONS='abort_on_error=1:symbolize=0:detect_leaks=0:detect_stack_use_a
 RUN cd ${WORKDIR} && \
     git clone https://github.com/Exim/exim && \
     cd exim && \
-    git checkout 38903fb && \
-    patch -p1 < ${WORKDIR}/exim-rand.patch && \
+    git checkout 73e85c6 && \
+    patch -p1 < ${WORKDIR}/exim.patch && \
     patch -p1 < ${WORKDIR}/exim-log-bug.patch && \
     cd src; mkdir Local; cp src/EDITME Local/Makefile && \
-    cd Local; patch -p1 < ${WORKDIR}/exim.patch; cd .. && \
     AFL_USE_ASAN=1 make CC=afl-clang-fast clean all install $MAKE_OPT
 
 # Download and compile Exim for coverage analysis
 RUN cd ${WORKDIR} && \
     git clone https://github.com/Exim/exim exim-gcov && \
     cd exim-gcov && \
-    git checkout 38903fb && \
-    patch -p1 < ${WORKDIR}/exim-rand.patch && \
+    git checkout 73e85c6 && \
+    patch -p1 < ${WORKDIR}/exim.patch && \
     patch -p1 < ${WORKDIR}/exim-log-bug.patch && \
     cd src; mkdir Local; cp src/EDITME Local/Makefile && \
-    cd Local; patch -p1 < ${WORKDIR}/exim.patch; cd .. && \
     make CFLAGS="-fprofile-arcs -ftest-coverage" LDFLAGS="-fprofile-arcs -ftest-coverage" LFLAGS+="-lgcov --coverage" clean all $MAKE_OPT
 
 # Configure exim

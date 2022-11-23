@@ -1,8 +1,48 @@
+diff --git a/src/src/EDITME b/src/src/EDITME
+index a87e6d7e2..8a4845f12 100644
+--- a/src/src/EDITME
++++ b/src/src/EDITME
+@@ -132,7 +132,7 @@ CONFIGURE_FILE=/usr/exim/configure
+ # deliveries. (Local deliveries run as various non-root users, typically as the
+ # owner of a local mailbox.) Specifying these values as root is not supported.
+ 
+-EXIM_USER=
++EXIM_USER=ubuntu
+ 
+ # If you specify EXIM_USER as a name, this is looked up at build time, and the
+ # uid number is built into the binary. However, you can specify that this
+@@ -203,7 +203,7 @@ SPOOL_DIRECTORY=/var/spool/exim
+ 
+ # Uncomment the following lines if you want
+ # to build Exim without any TLS support (either OpenSSL or GnuTLS):
+-# DISABLE_TLS=yes
++DISABLE_TLS=yes
+ # Unless you do this, you must define one of USE_OPENSSL or USE_GNUTLS
+ # below.
+ 
+@@ -277,7 +277,7 @@ SPOOL_DIRECTORY=/var/spool/exim
+ 
+ 
+ # Uncomment the following line to remove support for TLS Resumption
+-# DISABLE_TLS_RESUME=yes
++DISABLE_TLS_RESUME=yes
+ 
+ 
+ ###############################################################################
+@@ -478,7 +478,7 @@ PCRE_CONFIG=yes
+ # forces you to have SUPPORT_TLS enabled (the default).  For DANE under
+ # GnuTLS we need an additional library.  See TLS_LIBS or USE_GNUTLS_PC
+ # below.
+-SUPPORT_DANE=yes
++# SUPPORT_DANE=yes
+ 
+ #------------------------------------------------------------------------------
+ # Additional libraries and include directories may be required for some
 diff --git a/src/src/daemon.c b/src/src/daemon.c
-index 2935d0a..0dc0f08 100644
+index a4b1e2685..b6d4d911a 100644
 --- a/src/src/daemon.c
 +++ b/src/src/daemon.c
-@@ -451,7 +451,7 @@ if (pid == 0)
+@@ -495,7 +495,7 @@ if (pid == 0)
  
    DEBUG(D_any)
      debug_printf("Process %d is handling incoming connection from %s\n",
@@ -11,8 +51,8 @@ index 2935d0a..0dc0f08 100644
  
    /* Now disable debugging permanently if it's required only for the daemon
    process. */
-@@ -495,7 +495,7 @@ if (pid == 0)
-     reset_point = store_get(0);   /* Save current store high water point */
+@@ -539,7 +539,7 @@ if (pid == 0)
+     reset_point = store_mark();   /* Save current store high water point */
  
      DEBUG(D_any)
 -      debug_printf("Process %d is ready for new message\n", (int)getpid());
@@ -20,7 +60,7 @@ index 2935d0a..0dc0f08 100644
  
      /* Smtp_setup_msg() returns 0 on QUIT or if the call is from an
      unacceptable host or if an ACL "drop" command was triggered, -1 on
-@@ -1618,7 +1618,7 @@ if (inetd_wait_mode)
+@@ -2029,7 +2029,7 @@ if (f.inetd_wait_mode)
  
    log_write(0, LOG_MAIN,
      "exim %s daemon started: pid=%d, launched with listening socket, %s",
@@ -29,7 +69,7 @@ index 2935d0a..0dc0f08 100644
    set_process_info("daemon(%s): pre-listening socket", version_string);
  
    /* set up the timeout logic */
-@@ -1702,7 +1702,7 @@ else if (daemon_listen)
+@@ -2140,7 +2140,7 @@ else if (f.daemon_listen)
  
    log_write(0, LOG_MAIN,
      "exim %s daemon started: pid=%d, %s, listening for %s",
@@ -38,7 +78,7 @@ index 2935d0a..0dc0f08 100644
    set_process_info("daemon(%s): %s, listening for %s",
      version_string, qinfo, big_buffer);
    }
-@@ -1714,7 +1714,7 @@ else
+@@ -2152,7 +2152,7 @@ else
      : string_sprintf("-q%s", readconf_printtime(queue_interval));
    log_write(0, LOG_MAIN,
      "exim %s daemon started: pid=%d, %s, not listening for SMTP",
@@ -47,25 +87,27 @@ index 2935d0a..0dc0f08 100644
    set_process_info("daemon(%s): %s, not listening", version_string, s);
    }
  
-@@ -1814,7 +1814,7 @@ for (;;)
-           int sk;
- 
-           DEBUG(D_any) debug_printf("Starting queue-runner: pid %d\n",
--            (int)getpid());
+@@ -2284,6 +2284,10 @@ for (;;)
+         {
+         if ((pid = exim_fork(US"queue-runner")) == 0)
+           {
++
++            DEBUG(D_any) debug_printf("Starting queue-runner: pid %d\n",
 +            42);
- 
++
            /* Disable debugging if it's required only for the daemon process. We
            leave the above message, because it ties up with the "child ended"
-@@ -2097,7 +2097,7 @@ for (;;)
+           debugging messages. */
+@@ -2633,7 +2637,7 @@ for (;;)
+   if (sighup_seen)
      {
-     int sk;
      log_write(0, LOG_MAIN, "pid %d: SIGHUP received: re-exec daemon",
 -      getpid());
 +      42);
-     for (sk = 0; sk < listen_socket_count; sk++)
-       (void)close(listen_sockets[sk]);
-     alarm(0);
-@@ -2106,7 +2106,7 @@ for (;;)
+     close_daemon_sockets(daemon_notifier_fd,
+       listen_sockets, listen_socket_count);
+     ALARM_CLR(0);
+@@ -2642,7 +2646,7 @@ for (;;)
      exim_nullstd();
      execv(CS exim_path, (char *const *)sighup_argv);
      log_write(0, LOG_MAIN|LOG_PANIC_DIE, "pid %d: exec of %s failed: %s",
@@ -75,30 +117,30 @@ index 2935d0a..0dc0f08 100644
      }
  
 diff --git a/src/src/deliver.c b/src/src/deliver.c
-index 0a1ea19..a27e0a4 100644
+index e931d22e9..fade7df0e 100644
 --- a/src/src/deliver.c
 +++ b/src/src/deliver.c
-@@ -2174,7 +2174,7 @@ if (  !shadowing
+@@ -2246,7 +2246,7 @@ if (  !shadowing
  
    addr->return_filename =
      spool_fname(US"msglog", message_subdir, message_id,
 -      string_sprintf("-%d-%d", getpid(), return_count++));
 +      string_sprintf("-%d-%d", 42, return_count++));
-   
+ 
    if ((addr->return_file = open_msglog_file(addr->return_filename, 0400, &error)) < 0)
      {
-@@ -7164,7 +7164,7 @@ if (addr_senddsn)
+@@ -7417,7 +7417,7 @@ if (addr_senddsn)
    if (pid < 0)  /* Creation of child failed */
      {
      log_write(0, LOG_MAIN|LOG_PANIC_DIE, "Process %d (parent %d) failed to "
--      "create child process to send failure message: %s", getpid(),
-+      "create child process to send failure message: %s", 42,
+-      "create child process to send success-dsn message: %s", getpid(),
++      "create child process to send success-dsn message: %s", 42,
        getppid(), strerror(errno));
  
      DEBUG(D_deliver) debug_printf("DSN: child_open_exim failed\n");
-@@ -7359,7 +7359,7 @@ while (addr_failed)
+@@ -7613,7 +7613,7 @@ while (addr_failed)
  
-     if ((pid = child_open_exim(&fd)) < 0)
+     if ((pid = child_open_exim(&fd, US"bounce-message")) < 0)
        log_write(0, LOG_MAIN|LOG_PANIC_DIE, "Process %d (parent %d) failed to "
 -        "create child process to send failure message: %s", getpid(),
 +        "create child process to send failure message: %s", 42,
@@ -106,30 +148,30 @@ index 0a1ea19..a27e0a4 100644
  
      /* Creation of child succeeded */
 diff --git a/src/src/exim.c b/src/src/exim.c
-index a6a1ea8..efda3b5 100644
+index a42c48b2c..cbe7adeb8 100644
 --- a/src/src/exim.c
 +++ b/src/src/exim.c
-@@ -174,6 +174,7 @@ Returns:   nothing
+@@ -180,6 +180,7 @@ Returns:   nothing
  void
  set_process_info(const char *format, ...)
  {
 +/*
- int len = sprintf(CS process_info, "%5d ", (int)getpid());
- va_list ap;
- va_start(ap, format);
-@@ -185,6 +186,7 @@ process_info[len+1] = '\0';
- process_info_len = len + 1;
+ gstring gs = { .size = PROCESS_INFO_SIZE - 2, .ptr = 0, .s = process_info };
+ gstring * g;
+ int len;
+@@ -198,6 +199,7 @@ string_from_gstring(g);
+ process_info_len = g->ptr;
  DEBUG(D_process_info) debug_printf("set_process_info: %s", process_info);
  va_end(ap);
 +*/
  }
  
- 
+ /***********************************************
 diff --git a/src/src/exim_lock.c b/src/src/exim_lock.c
-index 0682168..4d21142 100644
+index dbdd97129..1424646b6 100644
 --- a/src/src/exim_lock.c
 +++ b/src/src/exim_lock.c
-@@ -305,7 +305,7 @@ if (use_lockfile)
+@@ -304,7 +304,7 @@ if (use_lockfile)
  
    /* Presumably, this must match appendfile.c */
    sprintf(hitchname, "%s.%s.%08x.%08x", lockname, primary_hostname,
@@ -138,11 +180,33 @@ index 0682168..4d21142 100644
  
    if (verbose)
      printf("exim_lock: lockname =  %s\n           hitchname = %s\n", lockname,
+diff --git a/src/src/expand.c b/src/src/expand.c
+index 4fb935528..08d1a680c 100644
+--- a/src/src/expand.c
++++ b/src/src/expand.c
+@@ -672,7 +672,7 @@ static var_entry var_table[] = {
+   { "qualify_domain",      vtype_stringptr,   &qualify_domain_sender },
+   { "qualify_recipient",   vtype_stringptr,   &qualify_domain_recipient },
+   { "queue_name",          vtype_stringptr,   &queue_name },
+-  { "queue_size",          vtype_string_func, &fn_queue_size },
++  { "queue_size_exim",     vtype_string_func, &fn_queue_size },
+   { "rcpt_count",          vtype_int,         &rcpt_count },
+   { "rcpt_defer_count",    vtype_int,         &rcpt_defer_count },
+   { "rcpt_fail_count",     vtype_int,         &rcpt_fail_count },
 diff --git a/src/src/globals.c b/src/src/globals.c
-index 79ac37f..1727f64 100644
+index 5d9f7f8c6..8f54810ee 100644
 --- a/src/src/globals.c
 +++ b/src/src/globals.c
-@@ -1237,7 +1237,7 @@ make use of the end of this string in order to save space. So the patching then
+@@ -1251,7 +1251,7 @@ int     queue_only_load        = -1;
+ uschar *queue_run_max          = US"5";
+ pid_t   queue_run_pid          = (pid_t)0;
+ int     queue_run_pipe         = -1;
+-unsigned queue_size            = 0;
++unsigned queue_size_exim       = 0;
+ time_t  queue_size_next        = 0;
+ uschar *queue_smtp_domains     = NULL;
+ 
+@@ -1433,7 +1433,7 @@ make use of the end of this string in order to save space. So the patching then
  wrecks this. We defeat this optimization by adding some additional characters
  onto the end of the string. */
  
@@ -150,12 +214,42 @@ index 79ac37f..1727f64 100644
 +uschar *running_status         = US"<<<testing>>>" "\0EXTRA";
  
  int     runrc                  = 0;
+
+diff --git a/src/src/globals.h b/src/src/globals.h
+index b610ac0a9..7c6a20217 100644
+--- a/src/src/globals.h
++++ b/src/src/globals.h
+@@ -833,7 +833,7 @@ extern uschar *queue_only_file;        /* Queue if file exists/not-exists */
+ extern BOOL    queue_only_override;    /* Allow override from command line */
+ extern BOOL    queue_run_in_order;     /* As opposed to random */
+ extern uschar *queue_run_max;          /* Max queue runners */
+-extern unsigned queue_size;            /* items in queue */
++extern unsigned queue_size_exim;            /* items in queue */
+ extern time_t  queue_size_next;        /* next time to evaluate queue_size */
+ extern uschar *queue_smtp_domains;     /* Ditto, for these domains */
+
+diff --git a/src/src/queue.c b/src/src/queue.c
+index 567784575..d26e18900 100644
+--- a/src/src/queue.c
++++ b/src/src/queue.c
+@@ -835,10 +835,10 @@ queue_count_cached(void)
+ time_t now;
+ if ((now = time(NULL)) >= queue_size_next)
+   {
+-  queue_size = queue_count();
++  queue_size_exim = queue_count();
+   queue_size_next = now + (f.running_in_test_harness ? 3 : QUEUE_SIZE_AGE);
+   }
+-return queue_size;
++return queue_size_exim;
+ }
  
+ /************************************************  
 diff --git a/src/src/receive.c b/src/src/receive.c
-index 7980c32..7661ae8 100644
+index 5471aa7cb..13dd21d85 100644
 --- a/src/src/receive.c
 +++ b/src/src/receive.c
-@@ -25,6 +25,8 @@ static FILE   *data_file = NULL;
+@@ -26,6 +26,8 @@ extern int dcc_ok;
  static int     data_fd = -1;
  static uschar *spool_name = US"";
  
@@ -163,10 +257,10 @@ index 7980c32..7661ae8 100644
 +
  enum CH_STATE {LF_SEEN, MID_LINE, CR_SEEN};
  
- 
-@@ -2585,9 +2587,9 @@ way. It appears in the initializing code in exim.c. The macro MESSAGE_ID_LENGTH
- must also be changed to reflect the correct string length. Then, of course,
- other programs that rely on the message id format will need updating too. */
+ #ifdef HAVE_LOCAL_SCAN
+@@ -2675,9 +2677,9 @@ must also be changed to reflect the correct string length. The queue-sort code
+ needs to know the layout. Then, of course, other programs that rely on the
+ message id format will need updating too. */
  
 -Ustrncpy(message_id, string_base62((long int)(message_id_tv.tv_sec)), 6);
 +Ustrncpy(message_id, "aaaaaa", 6);
@@ -176,88 +270,36 @@ index 7980c32..7661ae8 100644
  
  /* Deal with the case where the host number is set. The value of the number was
  checked when it was read, to ensure it isn't too big. The timing granularity is
-@@ -2597,10 +2599,7 @@ the message, if necessary (we hope it won't be). */
- if (host_number_string != NULL)
+@@ -2687,10 +2689,7 @@ the message, if necessary (we hope it won't be). */
+ if (host_number_string)
    {
-   id_resolution = (BASE_62 == 62)? 5000 : 10000;
+   id_resolution = BASE_62 == 62 ? 5000 : 10000;
 -  sprintf(CS(message_id + MESSAGE_ID_LENGTH - 3), "-%2s",
 -    string_base62((long int)(
 -      host_number * (1000000/id_resolution) +
 -        message_id_tv.tv_usec/id_resolution)) + 4);
-+  sprintf(CS(message_id + MESSAGE_ID_LENGTH - 3), "-%02d", message_id_gen++);
++    sprintf(CS(message_id + MESSAGE_ID_LENGTH - 3), "-%02d", message_id_gen++);
    }
  
  /* Host number not set: final field is just the fractional time at an
-@@ -2609,8 +2608,7 @@ appropriate resolution. */
- else
-   {
-   id_resolution = (BASE_62 == 62)? 500 : 1000;
--  sprintf(CS(message_id + MESSAGE_ID_LENGTH - 3), "-%2s",
--    string_base62((long int)(message_id_tv.tv_usec/id_resolution)) + 4);
-+  sprintf(CS(message_id + MESSAGE_ID_LENGTH - 3), "-%02d", message_id_gen++);
-   }
- 
- /* Add the current message id onto the current process info string if
 diff --git a/src/src/spool_out.c b/src/src/spool_out.c
-index 652506f..ce30708 100644
+index 8531112c0..ed2031557 100644
 --- a/src/src/spool_out.c
 +++ b/src/src/spool_out.c
-@@ -137,7 +137,7 @@ uschar * tname;
+@@ -154,7 +154,7 @@ struct stat statbuf;
+ uschar * tname;
  uschar * fname;
  
- tname = spool_fname(US"input", message_subdir,
--		    string_sprintf("hdr.%d", (int)getpid()), US"");
-+		    string_sprintf("hdr.%d", 42), US"");
+-tname = spool_fname(US"input", message_subdir, US"hdr.", message_id);
++tname = spool_fname(US"input", message_subdir, string_sprintf("hdr.%d", (int)getpid()), US"");
  
  if ((fd = spool_open_temp(tname)) < 0)
    return spool_write_error(where, errmsg, US"open", NULL, NULL);
-diff --git a/src/src/store.h b/src/src/store.h
-index 7c860f1..2e0ead1 100644
---- a/src/src/store.h
-+++ b/src/src/store.h
-@@ -30,12 +30,18 @@ tracing information for debugging. */
- #define store_extend(addr,old,new) \
-   store_extend_3(addr, old, new, __FILE__, __LINE__)
- 
--#define store_free(addr)     store_free_3(addr, __FILE__, __LINE__)
--#define store_get(size)      store_get_3(size, __FILE__, __LINE__)
--#define store_get_perm(size) store_get_perm_3(size, __FILE__, __LINE__)
--#define store_malloc(size)   store_malloc_3(size, __FILE__, __LINE__)
--#define store_release(addr)  store_release_3(addr, __FILE__, __LINE__)
--#define store_reset(addr)    store_reset_3(addr, __FILE__, __LINE__)
-+//#define store_free(addr)     store_free_3(addr, __FILE__, __LINE__)
-+//#define store_get(size)      store_get_3(size, __FILE__, __LINE__)
-+//#define store_get_perm(size) store_get_perm_3(size, __FILE__, __LINE__)
-+//#define store_malloc(size)   store_malloc_3(size, __FILE__, __LINE__)
-+//#define store_release(addr)  store_release_3(addr, __FILE__, __LINE__)
-+//#define store_reset(addr)    store_reset_3(addr, __FILE__, __LINE__)
-+#define store_free(addr) free(addr)
-+#define store_get(size) malloc(size)
-+#define store_get_perm(size) malloc(size)
-+#define store_malloc(size) malloc(size)
-+#define store_release(addr) free(addr)
-+#define store_reset(addr)
- 
- 
- /* The real functions */
-diff --git a/src/src/transport.c b/src/src/transport.c
-index b8a4636..2e93cf0 100644
---- a/src/src/transport.c
-+++ b/src/src/transport.c
-@@ -1081,7 +1081,7 @@ if (!(dkim->dkim_private_key && dkim->dkim_domain && dkim->dkim_selector))
-   return transport_write_message(out_fd, tctx, 0);
- 
- dkim_spool_name = spool_fname(US"input", message_subdir, message_id,
--		    string_sprintf("-%d-K", (int)getpid()));
-+		    string_sprintf("-%d-K", 42));
- 
- if ((dkim_fd = Uopen(dkim_spool_name, O_RDWR|O_CREAT|O_TRUNC, SPOOL_MODE)) < 0)
-   {
 diff --git a/src/src/transports/appendfile.c b/src/src/transports/appendfile.c
-index 9b3379b..20cd02b 100644
+index a53e3bc9c..650e19ef3 100644
 --- a/src/src/transports/appendfile.c
 +++ b/src/src/transports/appendfile.c
-@@ -1623,7 +1623,7 @@ if (!isdirectory)
+@@ -1550,7 +1550,7 @@ if (!isdirectory)
      /* cf. exim_lock.c */
      lockname = string_sprintf("%s.lock", filename);
      hitchname = string_sprintf( "%s.%s.%08x.%08x", lockname, primary_hostname,
@@ -266,7 +308,7 @@ index 9b3379b..20cd02b 100644
  
      DEBUG(D_transport) debug_printf("lock name: %s\nhitch name: %s\n", lockname,
        hitchname);
-@@ -2487,7 +2487,7 @@ else
+@@ -2419,7 +2419,7 @@ else
      DEBUG(D_transport)
        debug_printf("delivering to new file in %s\n", path);
      filename = dataname =
@@ -275,18 +317,18 @@ index 9b3379b..20cd02b 100644
      fd = Uopen(filename, O_WRONLY|O_CREAT, mode);
      if (fd < 0 &&                                 /* failed to open, and */
          (errno != ENOENT ||                       /* either not non-exist */
-@@ -2541,7 +2541,7 @@ else
+@@ -2471,7 +2471,7 @@ else
  
        (void)gettimeofday(&msg_tv, NULL);
-       basename = string_sprintf(TIME_T_FMT ".H%luP%lu.%s",
+       basename = string_sprintf(TIME_T_FMT ".M%luP" PID_T_FMT ".%s",
 -       	msg_tv.tv_sec, msg_tv.tv_usec, getpid(), primary_hostname);
 +       	16, 42, primary_hostname);
  
        filename = dataname = string_sprintf("tmp/%s", basename);
        newname = string_sprintf("new/%s", basename);
-@@ -2603,7 +2603,7 @@ else
+@@ -2532,7 +2532,7 @@ else
+     {
      FILE *env_file;
-     address_item *taddr;
      mailstore_basename = string_sprintf("%s/%s-%s", path, message_id,
 -      string_base62((long int)getpid()));
 +      "42");
@@ -294,10 +336,10 @@ index 9b3379b..20cd02b 100644
      DEBUG(D_transport)
        debug_printf("delivering in mailstore format in %s\n", path);
 diff --git a/src/src/transports/tf_maildir.c b/src/src/transports/tf_maildir.c
-index 7be7289..8754b07 100644
+index cd1964aa7..9f9ef28d8 100644
 --- a/src/src/transports/tf_maildir.c
 +++ b/src/src/transports/tf_maildir.c
-@@ -555,7 +555,7 @@ else
+@@ -541,7 +541,7 @@ else
  
    (void)gettimeofday(&tv, NULL);
    tempname = string_sprintf("%s/tmp/" TIME_T_FMT ".H%luP%lu.%s",
