@@ -11,7 +11,7 @@ strstr() {
 }
 
 #Commands for afl-based fuzzers (e.g., aflnet, aflnwe)
-if $(strstr $FUZZER "afl"); then
+if $(strstr $FUZZER "afl") || $(strstr $FUZZER "snapfuzz"); then
 
   # Run fuzzer-specific commands (if any)
   if [ -e ${WORKDIR}/run-${FUZZER} ]; then
@@ -21,10 +21,18 @@ if $(strstr $FUZZER "afl"); then
   TARGET_DIR=${TARGET_DIR:-"tinydtls"}
   INPUTS=${INPUTS:-${WORKDIR}"/in-dtls"}
 
+  #Snapfuzzplugin, so you don't have to give the path everytime
+  #Snapfuzz doesn't need a cleanup script
+  if $(strstr $FUZZER "snapfuzz"); then
+    plugin="-A /home/ubuntu/SnapFuzz/SaBRe/build/plugins/snapfuzz/libsnapfuzz.so"
+  else
+    plugin=""
+  fi
+
   #Step-1. Do Fuzzing
   #Move to fuzzing folder
   cd $WORKDIR
-  timeout -k 0 --preserve-status $TIMEOUT /home/ubuntu/${FUZZER}/afl-fuzz -d -i ${INPUTS} -o $OUTDIR -N udp://127.0.0.1/20220 $OPTIONS ./${TARGET_DIR}/tests/dtls-server
+  timeout -k 0 --preserve-status $TIMEOUT /home/ubuntu/${FUZZER}/afl-fuzz -d -i ${INPUTS} -o $OUTDIR -N udp://127.0.0.1/20220 $plugin $OPTIONS ./${TARGET_DIR}/tests/dtls-server
 
   STATUS=$?
 
