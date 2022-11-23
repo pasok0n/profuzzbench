@@ -1,0 +1,35 @@
+from dnsmasq
+
+USER root
+RUN apt-get -y update && apt-get -y install make \
+    cmake gettext libtool libsqlite3-dev \
+    gettext-base libelf-dev libc6-dbg cmake-curses-gui
+
+USER ubuntu
+WORKDIR /home/ubuntu
+ENV SNAPFUZZ="/home/ubuntu/SnapFuzz"
+ENV AFLNET="/home/ubuntu/snapfuzz"
+
+#SnapFuzz
+RUN git clone --recurse-submodules https://github.com/srg-imperial/SnapFuzz.git $SNAPFUZZ && \
+    cd $SNAPFUZZ/SaBRe/plugins && \
+    ln -s ../../snapfuzz snapfuzz && \
+    cd .. && mkdir build && cd build && \
+    cmake .. && make $MAKE_OPT
+
+#SnapFuzz's modified version of AFLnet 
+RUN git clone https://github.com/andronat/aflnet.git --branch mymaster --single-branch $AFLNET && \
+    cd $AFLNET && \
+    make clean all && \
+    cd llvm_mode && \
+    make
+
+USER root
+
+#Recompile dnsmasq with SnapFuzz, unlike stateafl, snapfuzz has no use for the original 
+RUN cd $WORKDIR/dnsmasq && \
+    make clean && \
+    AFL_USE_ASAN=1 CC=${AFLNET}/afl-clang-fast make $MAKE_OPT
+
+RUN cd $WORKDIR/dnsmasq/src/ && \
+    cp $SNAPFUZZ/SaBRe/build/sabre .
