@@ -21,7 +21,8 @@ RUN apt-get -y update && \
     gdb \
     netcat \
     strace \
-    wget
+    wget \
+    libcap-dev
 
 # Add a new user ubuntu, pass: ubuntu
 RUN groupadd ubuntu && \
@@ -39,7 +40,7 @@ WORKDIR /home/ubuntu
 ARG MAKE_OPT
 
 # Set up fuzzers
-RUN git clone https://github.com/profuzzbench/aflnet.git && \
+RUN git clone https://github.com/pasok0n/aflnet.git && \
     cd aflnet && \
     make clean all $MAKE_OPT && \
     cd llvm_mode && make $MAKE_OPT
@@ -70,7 +71,7 @@ env ASAN_OPTIONS='abort_on_error=1:symbolize=0:detect_leaks=0:detect_stack_use_a
 RUN cd $WORKDIR && \
     git clone https://github.com/assist-project/tinydtls-fuzz.git tinydtls && \
     cd tinydtls && \
-    git checkout 06995d4 && \
+    git checkout a7d1c0f && \
     cd tests && \
     CC=afl-clang-fast make clean && \
     AFL_USE_ASAN=1 CC=afl-clang-fast make ../libtinydtls.a $MAKE_OPT && \
@@ -80,7 +81,7 @@ RUN cd $WORKDIR && \
 RUN cd $WORKDIR && \
     git clone https://github.com/assist-project/tinydtls-fuzz.git tinydtls-gcov && \
     cd tinydtls-gcov && \
-    git checkout 06995d4 && \
+    git checkout a7d1c0f && \
     patch -p1 < $WORKDIR/gcov.patch && \
     cd tests && \
     cov=1 make clean && \
