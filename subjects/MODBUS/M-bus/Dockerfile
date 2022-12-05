@@ -39,14 +39,9 @@ WORKDIR /home/ubuntu
 # Import environment variable to pass as parameter to make (e.g., to make parallel builds with -j)
 ARG MAKE_OPT
 
-# Set up fuzzers
-RUN git clone https://github.com/pasok0n/aflnet.git && \
+# Set up fuzzer
+RUN git clone https://github.com/M3m3M4n/aflnet.git --branch modbus && \
     cd aflnet && \
-    make clean all $MAKE_OPT && \
-    cd llvm_mode && make $MAKE_OPT
-
-RUN git clone https://github.com/profuzzbench/aflnwe.git && \
-    cd aflnwe && \
     make clean all $MAKE_OPT && \
     cd llvm_mode && make $MAKE_OPT
 
@@ -61,3 +56,22 @@ ENV AFL_I_DONT_CARE_ABOUT_MISSING_CRASHES=1 \
 
 
 RUN mkdir $WORKDIR
+
+USER root
+RUN apt-get -y install cmake
+
+COPY --chown=ubuntu:ubuntu in-modbustcp/ ${WORKDIR}/in-modbustcp
+COPY --chown=ubuntu:ubuntu fuzzing.patch ${WORKDIR}/fuzzing.patch
+COPY --chown=ubuntu:ubuntu gcov.patch ${WORKDIR}/gcov.patch
+
+# Download and compile m-bus for fuzzing
+RUN cd $WORKDIR && git clone --recurse-submodules https://github.com/rtlabs-com/m-bus.git && \
+    cd m-bus && patch -p1 < $WORKDIR/fuzzing.patch && \
+    cmake -B build && \
+    cmake --build build --target all check
+
+# Download and compile m-bus for coverage analysis
+RUN cd $WORKDIR && git clone --recurse-submodules https://github.com/rtlabs-com/m-bus.git m-bus-gcov && \
+    cd m-bus-gcov && patch -p1 < $WORKDIR/gcov.patch && \
+    cmake -B build && \
+    cmake --build build --target all check
