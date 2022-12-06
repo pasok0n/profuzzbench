@@ -40,8 +40,13 @@ WORKDIR /home/ubuntu
 ARG MAKE_OPT
 
 # Set up fuzzer
-RUN git clone https://github.com/M3m3M4n/aflnet.git --branch modbus && \
+RUN git clone https://github.com/pasok0n/aflnet.git --branch modbus && \
     cd aflnet && \
+    make clean all $MAKE_OPT && \
+    cd llvm_mode && make $MAKE_OPT
+
+RUN git clone https://github.com/profuzzbench/aflnwe.git && \
+    cd aflnwe && \
     make clean all $MAKE_OPT && \
     cd llvm_mode && make $MAKE_OPT
 
@@ -63,6 +68,8 @@ RUN apt-get -y install cmake
 COPY --chown=ubuntu:ubuntu in-modbustcp/ ${WORKDIR}/in-modbustcp
 COPY --chown=ubuntu:ubuntu fuzzing.patch ${WORKDIR}/fuzzing.patch
 COPY --chown=ubuntu:ubuntu gcov.patch ${WORKDIR}/gcov.patch
+COPY --chown=ubuntu:ubuntu cov_script.sh ${WORKDIR}/cov_script
+COPY --chown=ubuntu:ubuntu run.sh ${WORKDIR}/run
 
 # Download and compile m-bus for fuzzing
 RUN cd $WORKDIR && git clone --recurse-submodules https://github.com/rtlabs-com/m-bus.git && \
@@ -71,7 +78,8 @@ RUN cd $WORKDIR && git clone --recurse-submodules https://github.com/rtlabs-com/
     cmake --build build --target all check
 
 # Download and compile m-bus for coverage analysis
+# coverage currently doesn't work
 RUN cd $WORKDIR && git clone --recurse-submodules https://github.com/rtlabs-com/m-bus.git m-bus-gcov && \
     cd m-bus-gcov && patch -p1 < $WORKDIR/gcov.patch && \
-    cmake -B build && \
+    cmake -B build -DCMAKE_C_FLAGS="-g -fprofile-arcs -ftest-coverage" -DCMAKE_CXX_FLAGS="-g -fprofile-arcs -ftest-coverage" && \
     cmake --build build --target all check

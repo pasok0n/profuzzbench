@@ -34,8 +34,11 @@ fi
 for f in $(echo $folder/$testdir/*.raw); do
   time=$(stat -c %Y $f)
 
+  #terminate running server(s)
+  pkill mb_tcp_slave
+
   $replayer $f MODBUSTCP $pno 1 > /dev/null 2>&1 &
-  timeout -k 0 -s SIGTERM 3s ./mb_tcp_slave > /dev/null 2>&1
+  timeout -k 0 3s ./mb_tcp_slave > /dev/null 2>&1
 
   wait
   cov_data=$(gcovr -r $WORKDIR/m-bus-gcov -s | grep "[lb][a-z]*:")
@@ -52,14 +55,17 @@ count=0
 for f in $(echo $folder/$testdir/id*); do
   time=$(stat -c %Y $f)
 
+  #terminate running server(s)
+  pkill mb_tcp_slave
+
   $replayer $f MODBUSTCP $pno 1 > /dev/null 2>&1 &
-  timeout -k 0 -s SIGTERM 3s ./mb_tcp_slave > /dev/null 2>&1
+  timeout -k 0 3s ./mb_tcp_slave > /dev/null 2>&1
 
   wait
   count=$(expr $count + 1)
   rem=$(expr $count % $step)
   if [ "$rem" != "0" ]; then continue; fi
-  cov_data=$(gcovr -r $WORKDIR/m-bus-gcov -s | grep "[lb][a-z]*:")
+  cov_data=$(gcovr -r $WORKDIR/m-bus-gcov/ -s | grep "[lb][a-z]*:")
   l_per=$(echo "$cov_data" | grep lines | cut -d" " -f2 | rev | cut -c2- | rev)
   l_abs=$(echo "$cov_data" | grep lines | cut -d" " -f3 | cut -c2-)
   b_per=$(echo "$cov_data" | grep branch | cut -d" " -f2 | rev | cut -c2- | rev)
