@@ -1,0 +1,15 @@
+diff --git a/afl-fuzz.c b/afl-fuzz.c
+index 88374b5..377b140 100644
+--- a/afl-fuzz.c
++++ b/afl-fuzz.c
+@@ -3614,8 +3614,8 @@ static u8 run_target(char** argv, u32 timeout) {
+   }
+ #else
+   if (total_execs == 1000000) {
+-    OKF("Snapfuzz-bench: Done!");
+-    raise(SIGINT);
++    //OKF("Snapfuzz-bench: Done!");
++    //raise(SIGINT);
+   }
+ #endif
+ 

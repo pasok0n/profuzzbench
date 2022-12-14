@@ -19,9 +19,12 @@ RUN git clone --recurse-submodules https://github.com/srg-imperial/SnapFuzz.git 
     cd .. && mkdir build && cd build && \
     cmake .. && make $MAKE_OPT
 
+COPY --chown=ubuntu:ubuntu snapfuzz.patch /home/ubuntu/snapfuzz.patch
+
 #SnapFuzz's modified version of AFLnet 
 RUN git clone https://github.com/andronat/aflnet.git --branch mymaster --single-branch $AFLNET && \
     cd $AFLNET && \
+    patch -p1 < /home/ubuntu/snapfuzz.patch && \
     make clean all && \
     cd llvm_mode && \
     make
@@ -36,7 +39,7 @@ RUN cd $WORKDIR && \
     git checkout 85c6a90 && \
     patch -p1 < ${WORKDIR}/fuzzing.patch && \
     cd Source/Release && \
-    AFL_USE_ASAN=1 CC=${AFLNET}/afl-clang-fast make clean all $MAKE_OPT
+    CC=/home/ubuntu/snapfuzz/afl-clang-fast make clean all $MAKE_OPT
 
 # Set up LightFTP for fuzzing
 RUN cd ${WORKDIR}/LightFTP-snapfuzz/Source/Release && \
