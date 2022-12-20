@@ -38,7 +38,7 @@ for f in $(echo $folder/$testdir/*.raw); do
   pkill mb_tcp_slave
 
   $replayer $f MODBUSTCP $pno 1 > /dev/null 2>&1 &
-  timeout -k 0 3s ./mb_tcp_slave > /dev/null 2>&1
+  timeout -k 0 3s ./build/mb_tcp_slave > /dev/null 2>&1
 
   wait
   cov_data=$(gcovr -r $WORKDIR/m-bus-gcov -s | grep "[lb][a-z]*:")
@@ -59,7 +59,7 @@ for f in $(echo $folder/$testdir/id*); do
   pkill mb_tcp_slave
 
   $replayer $f MODBUSTCP $pno 1 > /dev/null 2>&1 &
-  timeout -k 0 3s ./mb_tcp_slave > /dev/null 2>&1
+  timeout -k 0 3s ./build/mb_tcp_slave > /dev/null 2>&1
 
   wait
   count=$(expr $count + 1)
