@@ -30,7 +30,7 @@ RUN groupadd ubuntu && \
 
 RUN chmod 777 /tmp
 
-RUN pip3 install gcovr==4.2
+RUN pip3 install gcovr==5.2
 
 # Use ubuntu as default username
 USER ubuntu
@@ -75,8 +75,7 @@ RUN cd $WORKDIR && \
     ./configure \
     CC=afl-clang-fast \
     --disable-doh \
-    --enable-fuzzing=afl \
-    --prefix=$WORKDIR/bind/bin/build && \
+    --prefix=$WORKDIR/bind/build && \
     make $MAKE_OPT && make install
 
 # Download and compile Bind9 for coverage analysis
@@ -85,10 +84,10 @@ RUN cd $WORKDIR && \
     cd bind-gcov && \
     ./configure \
     CC="gcc" \
-    CFLAGS="-g -O3 -fprofile-arcs -ftest-coverage" \
+    CFLAGS="-g -O0 -fprofile-arcs -ftest-coverage" \
     LDFLAGS="-fprofile-arcs -ftest-coverage" \
     --disable-doh \
-    --prefix=$WORKDIR/bind-gcov/bin/build && \
+    --prefix=$WORKDIR/bind-gcov/build && \
     make $MAKE_OPT && make install
 
 
