@@ -1,5 +1,5 @@
 diff --git a/src/pool.c b/src/pool.c
-index 2cdfafa47..315d5cc8f 100644
+index 2cdfafa47..908bad648 100644
 --- a/src/pool.c
 +++ b/src/pool.c
 @@ -408,6 +408,9 @@ const char *pr_pool_get_tag(pool *p) {
@@ -44,15 +44,15 @@ index 2cdfafa47..315d5cc8f 100644
    pr_alarms_block();
  
    blok = new_block(sz + POOL_HDR_BYTES, TRUE);
-@@ -474,6 +483,8 @@ struct pool_rec *pr_pool_create_sz(struct pool_rec *p, size_t sz) {
-       new_pool->sub_next->sub_prev = new_pool;
- 
-     p->sub_pools = new_pool;
-+    */
-+    return malloc(sizeof(struct pool_rec));
-   }
- 
+@@ -479,6 +488,8 @@ struct pool_rec *pr_pool_create_sz(struct pool_rec *p, size_t sz) {
    pr_alarms_unblock();
+ 
+   return new_pool;
++  */
++  return malloc(sizeof(struct pool_rec));
+ }
+ 
+ /* Initialize the pool system by creating the base permanent_pool. */
 @@ -499,6 +510,8 @@ void free_pools(void) {
  
  static void clear_pool(struct pool_rec *p) {
