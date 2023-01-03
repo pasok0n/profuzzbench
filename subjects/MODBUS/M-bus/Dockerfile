@@ -30,7 +30,7 @@ RUN groupadd ubuntu && \
 
 RUN chmod 777 /tmp
 
-RUN pip3 install gcovr==4.2
+RUN pip3 install gcovr==5.2
 
 # Use ubuntu as default username
 USER ubuntu
@@ -75,11 +75,11 @@ COPY --chown=ubuntu:ubuntu run.sh ${WORKDIR}/run
 RUN cd $WORKDIR && git clone --recurse-submodules https://github.com/rtlabs-com/m-bus.git && \
     cd m-bus && patch -p1 < $WORKDIR/fuzzing.patch && \
     cmake -B build && \
-    cmake --build build --target all check
+    cmake --build build --target all
 
 # Download and compile m-bus for coverage analysis
 # coverage currently doesn't work
 RUN cd $WORKDIR && git clone --recurse-submodules https://github.com/rtlabs-com/m-bus.git m-bus-gcov && \
     cd m-bus-gcov && patch -p1 < $WORKDIR/gcov.patch && \
-    cmake -B build -DCMAKE_C_FLAGS="-g -fprofile-arcs -ftest-coverage" -DCMAKE_CXX_FLAGS="-g -fprofile-arcs -ftest-coverage" && \
-    cmake --build build --target all check
+    cmake -B build && cd build && \
+    make CFLAGS="-fprofile-arcs -ftest-coverage" CPPFLAGS="-fprofile-arcs -ftest-coverage" CXXFLAGS="-fprofile-arcs -ftest-coverage" LDFLAGS="-fprofile-arcs -ftest-coverage" all $MAKE_OPT

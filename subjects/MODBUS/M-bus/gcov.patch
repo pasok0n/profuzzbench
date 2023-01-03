@@ -1,3 +1,17 @@
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 8931e2e..0052b4d 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -17,7 +17,8 @@ cmake_minimum_required (VERSION 3.14)
+ list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
+ list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake/tools")
+ project (MBUS VERSION 0.1.0)
+-
++set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fprofile-arcs -ftest-coverage")
++set(CMAKE_CXX_FLAGS " ${CMAKE_CXX_FLAGS} -fprofile-arcs -ftest-coverage")
+ # Default settings if this is the main project
+ if (CMAKE_PROJECT_NAME STREQUAL MBUS)
+   include(CTest)
 diff --git a/sample/tcp_slave.c b/sample/tcp_slave.c
 index 18197c5..425706a 100644
 --- a/sample/tcp_slave.c
@@ -10,3 +24,26 @@ index 18197c5..425706a 100644
 +   os_usleep (2000 * 1000 * 1000);
     mb_slave_shutdown (s);
  }
+diff --git a/sample/slave.c b/sample/slave.c
+index 4e63900..bcb01e8 100644
+--- a/sample/slave.c
++++ b/sample/slave.c
+@@ -17,6 +17,7 @@
+ #include "mb_tcp.h"
+ #include "mb_rtu.h"
+ #include "osal.h"
++#include <stdio.h>
+ 
+ #include <string.h>
+ 
+@@ -27,6 +28,10 @@ static int coil_get (uint16_t address, uint8_t * data, size_t quantity)
+ {
+    uint16_t offset;
+ 
++   FILE *fp;
++   fp = fopen ("test.txt", "w");
++   fclose (fp);
++
+    for (offset = 0; offset < quantity; offset++)
+    {
+       uint32_t bit = address + offset;

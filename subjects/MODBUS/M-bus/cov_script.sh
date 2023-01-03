@@ -13,7 +13,7 @@ fmode=$5    #file mode -- structured or not
 rm $covfile; touch $covfile
 
 #clear gcov data
-gcovr -r $WORKDIR/m-bus-gcov -s -d > /dev/null 2>&1
+gcovr -r .. -s -d > /dev/null 2>&1
 
 #output the header of the coverage file which is in the CSV format
 #Time: timestamp, l_per/b_per and l_abs/b_abs: line/branch coverage in percentage and absolutate number
@@ -37,11 +37,11 @@ for f in $(echo $folder/$testdir/*.raw); do
   #terminate running server(s)
   pkill mb_tcp_slave
 
-  $replayer $f MODBUSTCP $pno 1 > /dev/null 2>&1 &
-  timeout -k 0 3s ./build/mb_tcp_slave > /dev/null 2>&1
+  $replayer $f MODBUSTCP $pno 10 10 > /dev/null 2>&1 &
+  timeout -k 0 3s ./mb_tcp_slave > /dev/null 2>&1
 
   wait
-  cov_data=$(gcovr -r $WORKDIR/m-bus-gcov -s | grep "[lb][a-z]*:")
+  cov_data=$(gcovr -r .. -s | grep "[lb][a-z]*:")
   l_per=$(echo "$cov_data" | grep lines | cut -d" " -f2 | rev | cut -c2- | rev)
   l_abs=$(echo "$cov_data" | grep lines | cut -d" " -f3 | cut -c2-)
   b_per=$(echo "$cov_data" | grep branch | cut -d" " -f2 | rev | cut -c2- | rev)
@@ -58,14 +58,14 @@ for f in $(echo $folder/$testdir/id*); do
   #terminate running server(s)
   pkill mb_tcp_slave
 
-  $replayer $f MODBUSTCP $pno 1 > /dev/null 2>&1 &
-  timeout -k 0 3s ./build/mb_tcp_slave > /dev/null 2>&1
+  $replayer $f MODBUSTCP $pno 10 10 > /dev/null 2>&1 &
+  timeout -k 0 3s ./mb_tcp_slave > /dev/null 2>&1
 
   wait
   count=$(expr $count + 1)
   rem=$(expr $count % $step)
   if [ "$rem" != "0" ]; then continue; fi
-  cov_data=$(gcovr -r $WORKDIR/m-bus-gcov/ -s | grep "[lb][a-z]*:")
+  cov_data=$(gcovr -r .. -s | grep "[lb][a-z]*:")
   l_per=$(echo "$cov_data" | grep lines | cut -d" " -f2 | rev | cut -c2- | rev)
   l_abs=$(echo "$cov_data" | grep lines | cut -d" " -f3 | cut -c2-)
   b_per=$(echo "$cov_data" | grep branch | cut -d" " -f2 | rev | cut -c2- | rev)
@@ -78,7 +78,7 @@ done
 if [[ $step -gt 1 ]]
 then
   time=$(stat -c %Y $f)
-  cov_data=$(gcovr -r $WORKDIR/m-bus-gcov -s | grep "[lb][a-z]*:")
+  cov_data=$(gcovr -r .. -s | grep "[lb][a-z]*:")
   l_per=$(echo "$cov_data" | grep lines | cut -d" " -f2 | rev | cut -c2- | rev)
   l_abs=$(echo "$cov_data" | grep lines | cut -d" " -f3 | cut -c2-)
   b_per=$(echo "$cov_data" | grep branch | cut -d" " -f2 | rev | cut -c2- | rev)
