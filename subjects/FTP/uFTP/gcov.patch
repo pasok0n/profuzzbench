@@ -1,0 +1,11 @@
+diff --git a/Makefile b/Makefile
+index b4460b3..2fb817a 100644
+--- a/Makefile
++++ b/Makefile
+@@ -1,5 +1,5 @@
+ #Linux Generic
+-CC=gcc
++CC=gcc -fprofile-arcs -ftest-coverage
+ 
+ OUTPATH=./build/
+ SOURCE_MODULES_PATH=./library/
