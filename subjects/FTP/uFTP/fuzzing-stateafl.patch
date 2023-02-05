@@ -1,0 +1,11 @@
+diff --git a/Makefile b/Makefile
+index b4460b3..8d498ff 100644
+--- a/Makefile
++++ b/Makefile
+@@ -1,5 +1,5 @@
+ #Linux Generic
+-CC=gcc
++CC=/home/ubuntu/stateafl/afl-clang-fast
+ 
+ OUTPATH=./build/
+ SOURCE_MODULES_PATH=./library/

@@ -1,0 +1,32 @@
+FROM uftp
+
+# Import environment variable to pass as parameter to make (e.g., to make parallel builds with -j)
+ARG MAKE_OPT
+
+# Set up StateAFL
+ENV STATEAFL="/home/ubuntu/stateafl"
+
+RUN git clone https://github.com/stateafl/stateafl.git $STATEAFL && \
+    cd $STATEAFL && \
+    make clean all $MAKE_OPT && \
+    rm as && \
+    cd llvm_mode && CFLAGS="${STATEAFL_CFLAGS}" make $MAKE_OPT
+
+# Set up environment variables for StateAFL
+ENV AFL_PATH=${STATEAFL}
+ENV PATH=${STATEAFL}:${PATH}
+
+COPY --chown=ubuntu:ubuntu fuzzing-stateafl.patch ${WORKDIR}/fuzzing-stateafl.patch
+
+# Dedicated instrumented version for StateAFL
+RUN cd $WORKDIR && \
+    git clone https://github.com/kingk85/uFTP.git  uFTP-stateafl && \
+    cd uFTP-stateafl && \
+    git checkout 9c380fe && \
+    patch -p1 < ${WORKDIR}/fuzzing-stateafl.patch && \
+    AFL_USE_ASAN=1 make $MAKE_OPT
+
+
+COPY --chown=ubuntu:ubuntu in-ftp-replay ${WORKDIR}/in-ftp-replay
+COPY --chown=ubuntu:ubuntu run-stateafl.sh ${WORKDIR}/run-stateafl
+
