@@ -47,7 +47,7 @@ if $(strstr $FUZZER "afl"); then
   fi
 
   cd $WORKDIR/kamailio-gcov
-  gcovr -r . --html --html-details -o index.html
+  gcovr -r . --html-details --html-self-contained -o index.html
   mkdir ${WORKDIR}/${TARGET_DIR}/${OUTDIR}/cov_html/
   cp *.html ${WORKDIR}/${TARGET_DIR}/${OUTDIR}/cov_html/
 
