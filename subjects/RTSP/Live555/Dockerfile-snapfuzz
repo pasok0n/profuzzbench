@@ -19,6 +19,8 @@ RUN git clone --recurse-submodules https://github.com/srg-imperial/SnapFuzz.git 
     cd .. && mkdir build && cd build && \
     cmake .. && make $MAKE_OPT
 
+COPY --chown=ubuntu:ubuntu snapfuzz.patch /home/ubuntu/snapfuzz.patch
+
 #SnapFuzz's modified version of AFLnet 
 RUN git clone https://github.com/andronat/aflnet.git --branch mymaster --single-branch $AFLNET && \
     cd $AFLNET && \
