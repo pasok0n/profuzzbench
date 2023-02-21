@@ -22,6 +22,7 @@ RUN git clone --recurse-submodules https://github.com/srg-imperial/SnapFuzz.git 
 #SnapFuzz's modified version of AFLnet 
 RUN git clone https://github.com/andronat/aflnet.git --branch mymaster --single-branch $AFLNET && \
     cd $AFLNET && \
+    patch -p1 < /home/ubuntu/snapfuzz.patch && \
     make clean all && \
     cd llvm_mode && \
     make
