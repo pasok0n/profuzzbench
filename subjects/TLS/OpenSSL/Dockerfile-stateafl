@@ -22,7 +22,7 @@ RUN cd ${WORKDIR} && \
     git clone https://github.com/openssl/openssl.git openssl-stateafl && \
     cd openssl-stateafl && \
     cp ${WORKDIR}/*.pem ./ && \
-    git checkout f868abc && \
+    git checkout 830bf8e && \
     patch -p1 < ${WORKDIR}/rand.patch && \
     CC=${STATEAFL}/afl-clang-fast ./config no-shared --with-rand-seed=none && \
     CC=${STATEAFL}/afl-clang-fast make && \
