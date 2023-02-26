@@ -76,7 +76,7 @@ RUN cd $WORKDIR && \
     CC=afl-clang-fast \
     --disable-doh \
     --prefix=$WORKDIR/bind/build && \
-    make $MAKE_OPT && make install
+    AFL_USE_ASAN=1 make $MAKE_OPT && make install
 
 # Download and compile Bind9 for coverage analysis
 RUN cd $WORKDIR && \

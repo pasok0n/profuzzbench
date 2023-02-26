@@ -25,7 +25,7 @@ RUN cd $WORKDIR && \
     CC=${STATEAFL}/afl-clang-fast \
     --disable-doh \
     --prefix=$WORKDIR/bind-stateafl/build && \
-    make $MAKE_OPT && make install
+    AFL_USE_ASAN=1 make $MAKE_OPT && make install
 
 COPY --chown=ubuntu:ubuntu in-dns-replay ${WORKDIR}/in-dns-replay
 COPY --chown=ubuntu:ubuntu run-stateafl.sh ${WORKDIR}/run-stateafl
