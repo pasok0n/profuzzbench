@@ -75,7 +75,7 @@ RUN cd $WORKDIR && \
     cd uFTP && \
     git checkout 9c380fe && \
     patch -p1 < ${WORKDIR}/fuzzing.patch && \
-    make $MAKE_OPT
+    AFL_USE_ASAN=1 make $MAKE_OPT
 
 # Set up LightFTP for fuzzing
 RUN mkdir /home/ubuntu/ftpshare
