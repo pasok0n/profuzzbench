@@ -1,0 +1,29 @@
+FROM modbustcp
+
+# Import environment variable to pass as parameter to make (e.g., to make parallel builds with -j)
+ARG MAKE_OPT
+
+# Set up StateAFL
+ENV STATEAFL="/home/ubuntu/stateafl"
+
+RUN git clone https://github.com/stateafl/stateafl.git $STATEAFL && \
+    cd $STATEAFL && \
+    make clean all $MAKE_OPT && \
+    rm as && \
+    cd llvm_mode && make $MAKE_OPT
+
+# Set up environment variables for StateAFL
+ENV AFL_PATH=${STATEAFL}
+ENV PATH=${STATEAFL}:${PATH}
+
+COPY --chown=ubuntu:ubuntu fuzzing-stateafl.patch ${WORKDIR}/fuzzing-stateafl.patch
+
+RUN cd $WORKDIR && \
+    git clone --recurse-submodules https://github.com/rtlabs-com/m-bus.git m-bus-stateafl && \
+    cd m-bus-stateafl && \
+    patch -p1 < $WORKDIR/fuzzing-stateafl.patch && \
+    cmake -B build && \
+    cmake --build build --target all check
+
+COPY --chown=ubuntu:ubuntu in-modbustcp-replay/ ${WORKDIR}/in-modbustcp-replay
+COPY --chown=ubuntu:ubuntu run-stateafl.sh ${WORKDIR}/run-stateafl
