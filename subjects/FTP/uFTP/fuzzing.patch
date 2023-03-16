@@ -1,0 +1,23 @@
+diff --git a/Makefile b/Makefile
+index b4460b3..8d498ff 100644
+--- a/Makefile
++++ b/Makefile
+@@ -1,5 +1,5 @@
+ #Linux Generic
+-CC=gcc
++CC=/home/ubuntu/aflnet/afl-clang-fast
+ 
+ OUTPATH=./build/
+ SOURCE_MODULES_PATH=./library/
+diff --git a/ftpServer.h b/ftpServer.h
+index 63b9d91..8be0413 100644
+--- a/ftpServer.h
++++ b/ftpServer.h
+@@ -26,7 +26,7 @@
+ #ifndef FTPSERVER_H
+ #define FTPSERVER_H
+ 
+-#define MAX_FTP_CLIENTS                 10
++#define MAX_FTP_CLIENTS                 1
+ #define UFTP_SERVER_VERSION             "v2.2.0 RC1"
+ 
